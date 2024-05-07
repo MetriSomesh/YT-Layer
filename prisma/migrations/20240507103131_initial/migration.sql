@@ -4,6 +4,7 @@ CREATE TYPE "UserType" AS ENUM ('YOUTUBER', 'EDITOR');
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
+    "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "userType" "UserType" NOT NULL,
@@ -15,6 +16,7 @@ CREATE TABLE "User" (
 CREATE TABLE "YouTuber" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
+    "channelName" TEXT NOT NULL,
     "api_key" TEXT NOT NULL,
 
     CONSTRAINT "YouTuber_pkey" PRIMARY KEY ("id")
@@ -34,7 +36,7 @@ CREATE TABLE "Video" (
 CREATE TABLE "Editor" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "channel" TEXT NOT NULL,
+    "channel" TEXT,
 
     CONSTRAINT "Editor_pkey" PRIMARY KEY ("id")
 );
@@ -44,6 +46,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "YouTuber_userId_key" ON "YouTuber"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "YouTuber_channelName_key" ON "YouTuber"("channelName");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "YouTuber_api_key_key" ON "YouTuber"("api_key");

@@ -34,7 +34,8 @@ model YouTuber{
   userId Int @unique
   user User @relation(fields: [userId],references: [id])
   channelName String 
-  api_key String 
+  accessToken String @default("")
+  refreshToken String @default("")
   videos Video[]
 
 }
@@ -42,6 +43,9 @@ model YouTuber{
 model Video{
   id Int @id @default(autoincrement())
   title String
+  description String
+  status String
+  tags String
   url String
   youtuberId Int
   youtuber YouTuber @relation(fields: [youtuberId],references: [id])

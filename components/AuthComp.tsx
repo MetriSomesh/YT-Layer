@@ -63,15 +63,26 @@ export default function AuthComp({ type }: { type: string }) {
                     }
                   );
 
-                  if (res) {
-                    localStorage.setItem("userEmail", email);
-                    router.push("/account");
+                  if (res.status === 201) {
+                    if (userType === UserType.YOUTUBER) {
+                      localStorage.setItem("userEmail", email);
+                      //push to anoter route
+                      const res = axios.get(
+                        "http://localhost:3000/api/googleauth"
+                      );
+                      const url = (await res).data.authUrl;
+                      window.location.href = url;
+                      // window.open((await res).data, "_blank");
+                    } else {
+                      localStorage.setItem("userEmail", email);
+                      router.push("/account");
+                    }
                   }
                 }}
                 type="button"
                 className="mt-8 w-full text-white bg-gray-800 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
               >
-                {type === "signup" ? "Sign Up" : "Sign In"}
+                {type === "signup" ? "Continue" : "Sign In"}
               </button>
 
               <div className="text-xs mt-2">

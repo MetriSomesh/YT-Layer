@@ -12,9 +12,12 @@ export const POST = async (req: NextRequest) => {
   });
 
   if (existingUser) {
-    return NextResponse.json({
-      msg: "Email is Already Register",
-    });
+    return NextResponse.json(
+      {
+        msg: "Email is already registered",
+      },
+      { status: 400 }
+    );
   }
 
   try {
@@ -27,12 +30,18 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
-    return NextResponse.json({
-      msg: "User Created",
-    });
+    return NextResponse.json(
+      {
+        msg: "User Created",
+      },
+      { status: 201 }
+    );
   } catch (error) {
-    return NextResponse.json({
-      error: "Internal Server Error",
-    });
+    return NextResponse.json(
+      {
+        error: "Internal Server Error",
+      },
+      { status: 500 }
+    );
   }
 };

@@ -33,7 +33,7 @@ model YouTuber{
   id Int @id @default(autoincrement())
   userId Int @unique
   user User @relation(fields: [userId],references: [id])
-  channelName String 
+  // channelName String 
   accessToken String @default("")
   refreshToken String @default("")
   videos Video[]

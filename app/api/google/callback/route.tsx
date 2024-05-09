@@ -1,6 +1,8 @@
 import { google } from "googleapis";
 import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 import OAUTH2Data from "../../../../credentials.json";
+const prisma = new PrismaClient();
 
 export const GET = async (req: NextRequest) => {
   const CLIENT_ID = OAUTH2Data.web.client_id;
@@ -19,11 +21,37 @@ export const GET = async (req: NextRequest) => {
 
   try {
     // Exchange authorization code for access token
+    const oauth2 = google.oauth2({
+      version: "v2",
+      auth: oAuth2Client,
+    });
+
     const { tokens } = await oAuth2Client.getToken(code as string);
     const accessToken = tokens.access_token;
-    // const expiryTime = new Date().getTime() + tokens.expires_in * 1000;
+    // oAuth2Client.setCredentials(tokens);
+    const expiryTime = tokens.expiry_date;
     // Return the access token
-    return NextResponse.json({ accessToken });
+    // const { data } = await google
+    //   .oauth2({ version: "v2", auth: oAuth2Client })
+    //   .userinfo.get();
+
+    // const name = data.name;
+    // const pic = data.picture;
+
+    // console.log(name);
+    const user = await prisma.user.findFirst({
+      where: { id: req.user.id }, // Assuming you have the authenticated user's id in req.user
+    });
+
+    await prisma.youTuber.create({
+      data: {
+        accessToken: accessToken || "",
+        refreshToken: expiryTime?.toString() || "", // Convert expiry time to milliseconds
+        // Other fields if needed
+      },
+    });
+
+    return NextResponse.redirect("/dashboard");
   } catch (error) {
     console.error(
       "Error exchanging authorization code for access token:",

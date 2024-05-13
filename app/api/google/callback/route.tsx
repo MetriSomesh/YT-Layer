@@ -28,30 +28,38 @@ export const GET = async (req: NextRequest) => {
 
     const { tokens } = await oAuth2Client.getToken(code as string);
     const accessToken = tokens.access_token;
-    // oAuth2Client.setCredentials(tokens);
+    oAuth2Client.setCredentials(tokens);
     const expiryTime = tokens.expiry_date;
+
+    // const user = await prisma.user.findFirst({
+    //   where: {
+    //     email: userEmail,
+    //   },
+    // });
     // Return the access token
-    // const { data } = await google
-    //   .oauth2({ version: "v2", auth: oAuth2Client })
-    //   .userinfo.get();
+    const { data } = await google
+      .oauth2({ version: "v2", auth: oAuth2Client })
+      .userinfo.get();
 
-    // const name = data.name;
-    // const pic = data.picture;
+    const email = data;
 
-    // console.log(name);
-    const user = await prisma.user.findFirst({
-      where: { id: req.user.id }, // Assuming you have the authenticated user's id in req.user
+    console.log(email);
+    // const user = await prisma.user.findFirst({
+    //   where: { id: req.user.id }, // Assuming you have the authenticated user's id in req.user
+    // });
+
+    // await prisma.youTuber.create({
+    //   data: {
+    //     user: { connect: { id: user?.id } },
+    //     accessToken: accessToken || "",
+    //     refreshToken: expiryTime?.toString() || "", // Convert expiry time to milliseconds
+    //     // Other fields if needed
+    //   },
+    // });
+
+    return NextResponse.json({
+      tokens,
     });
-
-    await prisma.youTuber.create({
-      data: {
-        accessToken: accessToken || "",
-        refreshToken: expiryTime?.toString() || "", // Convert expiry time to milliseconds
-        // Other fields if needed
-      },
-    });
-
-    return NextResponse.redirect("/dashboard");
   } catch (error) {
     console.error(
       "Error exchanging authorization code for access token:",

@@ -15,6 +15,12 @@ export default function AuthComp({ type }: { type: string }) {
       ? UserType.YOUTUBER
       : UserType.EDITOR;
   const router = useRouter();
+  const config = {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-type": "application/json",
+    },
+  };
   return (
     <div className="h-screen flex justify-center flex-col">
       <div className="flex justify-center">
@@ -71,8 +77,16 @@ export default function AuthComp({ type }: { type: string }) {
                         "http://localhost:3000/api/googleauth"
                       );
                       const url = (await res).data.authUrl;
-                      window.location.href = url;
-                      // window.open((await res).data, "_blank");
+                      // console.log(
+                      //   "URL ------------------------------------:",
+                      //   url
+                      // );
+                      // console.log(url);
+                      // const a = await(window.location.href = url);
+                      // const newRes = await axios.get(url, config);
+                      // console.log(newRes.data);
+                      // <a href={url}  />;
+                      router.push(url);
                     } else {
                       localStorage.setItem("userEmail", email);
                       router.push("/account");

@@ -1,6 +1,7 @@
 import { google } from "googleapis";
 import { NextRequest, NextResponse } from "next/server";
 import OAUTH2Data from "../../../credentials.json";
+import { middleware } from "../../middleware";
 
 export const GET = async (req: NextRequest) => {
   const CLIENT_ID = OAUTH2Data.web.client_id;
@@ -22,7 +23,6 @@ export const GET = async (req: NextRequest) => {
       access_type: "offline",
       scope: scopes,
     });
-
     // Return the generated URL
     return NextResponse.json({ authUrl });
   } catch (error) {

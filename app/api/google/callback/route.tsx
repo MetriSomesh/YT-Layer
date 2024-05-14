@@ -31,35 +31,44 @@ export const GET = async (req: NextRequest) => {
     oAuth2Client.setCredentials(tokens);
     const expiryTime = tokens.expiry_date;
 
-    // const user = await prisma.user.findFirst({
-    //   where: {
-    //     email: userEmail,
-    //   },
-    // });
     // Return the access token
     const { data } = await google
       .oauth2({ version: "v2", auth: oAuth2Client })
       .userinfo.get();
 
-    const email = data;
+    //  const { newdata } = await google
+    //    .oauth2({ version: "v2", auth: oAuth2Client })
+    //    .userinfo.email.get();
 
-    console.log(email);
+    const userEmail = data.email || "";
     // const user = await prisma.user.findFirst({
     //   where: { id: req.user.id }, // Assuming you have the authenticated user's id in req.user
     // });
 
-    // await prisma.youTuber.create({
-    //   data: {
-    //     user: { connect: { id: user?.id } },
-    //     accessToken: accessToken || "",
-    //     refreshToken: expiryTime?.toString() || "", // Convert expiry time to milliseconds
-    //     // Other fields if needed
-    //   },
-    // });
-
-    return NextResponse.json({
-      tokens,
+    const user = await prisma.user.findFirst({
+      where: {
+        email: userEmail,
+      },
+      select: {
+        id: true,
+      },
     });
+    console.log(user?.id);
+
+    const newYoutuber = await prisma.youTuber.create({
+      data: {
+        user: { connect: { id: user?.id } },
+        accessToken: accessToken || "",
+        refreshToken: expiryTime?.toString() || "", // Convert expiry time to milliseconds
+        // Other fields if needed
+      },
+    });
+
+    if (newYoutuber) {
+      console.log("Youtuber data created successfully");
+    }
+
+    return NextResponse.redirect("http://localhost:3000/signin");
   } catch (error) {
     console.error(
       "Error exchanging authorization code for access token:",

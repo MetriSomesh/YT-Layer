@@ -29,26 +29,24 @@ model User{
 }
 
 
-model YouTuber{
-  id Int @id @default(autoincrement())
-  userId Int @unique
-  user User @relation(fields: [userId],references: [id])
-  // channelName String 
-  accessToken String @default("")
-  refreshToken String @default("")
-  videos Video[]
-
+model YouTuber {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique
+  user         User     @relation(fields: [userId],references: [id])
+  accessToken  String   @default("")
+  refreshToken String   @default("")
+  video        Video?
 }
 
-model Video{
-  id Int @id @default(autoincrement())
-  title String
+model Video {
+  id          Int      @id @default(autoincrement())
+  title       String
   description String
-  status String
-  tags String
-  url String
-  youtuberId Int
-  youtuber YouTuber @relation(fields: [youtuberId],references: [id])
+  status      String
+  tags        String
+  url         String
+  youtuberId  Int @unique
+  youtuber    YouTuber @relation(fields: [youtuberId],references: [id])
 }
 
 model Editor {

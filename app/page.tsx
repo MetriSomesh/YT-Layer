@@ -3,10 +3,12 @@ import Image from "next/image";
 import editorImage from "../assets/editor.png";
 import { useRouter } from "next/navigation";
 import YoutuberIcon from "../components/YoutubeIcon";
+import { Appbar } from "@/components/Appbar";
 export default function Home() {
   const router = useRouter();
   return (
     <div className="h-screen w-screen">
+      <Appbar />
       <div className="flex justify-center flex-col h-screen">
         <div className="flex justify-center">
           <div>

@@ -12,27 +12,22 @@ const handler = NextAuth({
         password: { label: "password", type: "password", placeholder: "" },
       },
       async authorize(credentials: any) {
-        console.log(credentials);
-        const userId = await prisma.user.findUnique({
+        // console.log(credentials);
+        const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
           },
-          select: {
-            username: true,
-            password: true,
-            id: true,
-          },
         });
-        if (userId === null) {
-          return {
-            id: "",
-            email: "",
-            username: "",
-          };
+
+        // console.log(user);
+
+        if (!user) {
+          return null;
         }
+
         return {
-          id: userId.id.toString(),
-          username: userId.username,
+          id: user.id.toString(),
+          name: user.username,
           email: credentials.email,
         };
       },
@@ -40,11 +35,13 @@ const handler = NextAuth({
   ],
   secret: process.env.NEXTAUTH_URL,
   callbacks: {
-    session: ({ session, token, userId }: any) => {
-      if (session && session.userId) {
-        session.userId.id = token.sub;
-      }
-
+    jwt: ({ token, user }) => {
+      // console.log(token);
+      return token;
+    },
+    session: ({ session, token, user }: any) => {
+      session.user.id = token.sub;
+      console.log(session);
       return session;
     },
   },

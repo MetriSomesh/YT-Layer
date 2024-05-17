@@ -22,7 +22,8 @@ model User{
   id Int @id @default(autoincrement())
   username String
   email String @unique
-  password String 
+  password String
+  token String @default("") 
   userType UserType
   youtuber YouTuber?
   editor Editor?

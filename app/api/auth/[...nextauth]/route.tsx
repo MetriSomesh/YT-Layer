@@ -1,47 +1,80 @@
 import { PrismaClient } from "@prisma/client";
+import { SignJWT, importJWK } from "jose";
 import NextAuth from "next-auth/next";
-import CredentialsProviders from "next-auth/providers/credentials";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+
 const prisma = new PrismaClient();
+
+interface CustomUser {
+  id: string;
+  name: string;
+  email: string;
+  token: string;
+}
+
+const generateJWT = async (payload: any) => {
+  const secret = process.env.JWT_SECRET || "secret";
+  const jwk = await importJWK({ k: secret, alg: "HS256", kty: "oct" });
+  const jwt = await new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("2w")
+    .sign(jwk);
+  return jwt;
+};
 
 const handler = NextAuth({
   providers: [
-    CredentialsProviders({
+    CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: { label: "email", type: "text", placeholder: "" },
         password: { label: "password", type: "password", placeholder: "" },
       },
       async authorize(credentials: any) {
-        // console.log(credentials);
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
+          where: { email: credentials.email },
         });
-
-        // console.log(user);
 
         if (!user) {
           return null;
         }
 
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        const jwtToken = await generateJWT({ id: user.id });
+
         return {
           id: user.id.toString(),
           name: user.username,
           email: credentials.email,
-        };
+          token: jwtToken,
+        } as CustomUser;
       },
     }),
   ],
-  secret: process.env.NEXTAUTH_URL,
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    jwt: ({ token, user }) => {
-      // console.log(token);
+    async jwt({ token, user }) {
+      if (user) {
+        const customUser = user as CustomUser;
+        token.uid = customUser.id;
+        token.jwtToken = customUser.token;
+      }
       return token;
     },
-    session: ({ session, token, user }: any) => {
-      session.user.id = token.sub;
-      console.log(session);
+    async session({ session, token, user }: any) {
+      if (token && user) {
+        session.user.id = token.uid as string;
+        session.user.jwtToken = token.jwtToken as string;
+      }
       return session;
     },
   },
@@ -52,102 +85,3 @@ const handler = NextAuth({
 
 export const GET = handler;
 export const POST = handler;
-
-// async authorize(credentials: any) {
-//         try {
-//           if (process.env.LOCAL_CMS_PROVIDER) {
-//             return {
-//               id: '1',
-//               name: 'test',
-//               email: 'test@gmail.com',
-//               token: await generateJWT({
-//                 id: '1',
-//               }),
-//             };
-//           }
-//           const hashedPassword = await bcrypt.hash(credentials.password, 10);
-
-//           const userDb = await prisma.user.findFirst({
-//             where: {
-//               email: credentials.username,
-//             },
-//             select: {
-//               password: true,
-//               id: true,
-//               name: true,
-//             },
-//           });
-//           if (
-//             userDb &&
-//             userDb.password &&
-//             (await bcrypt.compare(credentials.password, userDb.password))
-//           ) {
-//             const jwt = await generateJWT({
-//               id: userDb.id,
-//             });
-//             await db.user.update({
-//               where: {
-//                 id: userDb.id,
-//               },
-//               data: {
-//                 token: jwt,
-//               },
-//             });
-// return {
-//               id: userDb.id,
-//               name: userDb.name,
-//               email: credentials.username,
-//               token: jwt,
-//             };
-//           }
-//           console.log('not in db');
-//           const user: AppxSigninResponse = await validateUser(
-//             credentials.username,
-//             credentials.password,
-//           );
-
-//           const jwt = await generateJWT({
-//             id: user.data?.userid,
-//           });
-
-//           if (user.data) {
-//             try {
-//               await db.user.upsert({
-//                 where: {
-//                   id: user.data.userid,
-//                 },
-//                 create: {
-//                   id: user.data.userid,
-//                   name: user.data.name,
-//                   email: credentials.username,
-//                   token: jwt,
-//                   password: hashedPassword,
-//                 },
-//                 update: {
-//                   id: user.data.userid,
-//                   name: user.data.name,
-//                   email: credentials.username,
-//                   token: jwt,
-//                   password: hashedPassword,
-//                 },
-//               });
-//             } catch (e) {
-//               console.log(e);
-//             }
-
-//             return {
-//               id: user.data.userid,
-//               name: user.data.name,
-//               email: credentials.username,
-//               token: jwt,
-//             };
-//           }
-
-//           // Return null if user data could not be retrieved
-//           return null;
-//         } catch (e) {
-//           console.error(e);
-//         }
-//         return null;
-//       },
-//     }),

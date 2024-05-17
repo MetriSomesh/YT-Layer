@@ -21,6 +21,7 @@ export const GET = async (req: NextRequest) => {
   try {
     const authUrl = oAuth2Client.generateAuthUrl({
       access_type: "offline",
+      prompt: "consent",
       scope: scopes,
     });
     // Return the generated URL

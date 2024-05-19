@@ -8,7 +8,10 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request, secret: secret });
   const url = request.nextUrl;
 
+  console.log(token);
+
   if (token && url.pathname.startsWith("/signin")) {
+    console.log("Got this condition");
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -22,5 +25,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/signin"],
 };

@@ -14,8 +14,10 @@ export const POST = async (req: NextRequest) => {
   if (existingUser) {
     await prisma.youTuber.deleteMany();
 
+    await prisma.editor.deleteMany();
     // Now delete all records from the User table
     await prisma.user.deleteMany();
+
     // return NextResponse.json(
     //   {
     //     msg: "Email is already registered",
@@ -40,6 +42,7 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json(
       {
         msg: "User Created",
+        user: newUser,
       },
       { status: 201 }
     );

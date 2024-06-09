@@ -54,5 +54,11 @@ model Editor {
   id        Int     @id @default(autoincrement())
   userId    Int     @unique
   user      User    @relation(fields: [userId], references: [id])
-  channel String?
+  profile_pic String @unique
+  description String
+  experience String
+  phone_number String
+  country String
+  state String
+  city String
 }

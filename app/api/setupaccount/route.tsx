@@ -2,54 +2,75 @@ import { PrismaClient, UserType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
-export const POST = async (req: NextRequest) => {
-  const body = await req.json();
-
-  const { channelName, apiKey, email } = body;
-
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  const existingChannel = await prisma.youTuber.findFirst({
-    where: { channelName },
-  });
-
-  if (existingChannel) {
-    return NextResponse.json({
-      msg: "Already done setting up your account",
-    });
-  }
-
-  if (!existingUser) {
-    return NextResponse.json({
-      msg: "Your account does not exists or not a Youtuber",
-    });
-  }
+export const POST = async (req: NextRequest, res: NextResponse) => {
+  const formData = await req.formData();
 
   try {
-    console.log(apiKey);
-    const newUser = await prisma.youTuber.create({
-      data: {
-        user: { connect: { id: existingUser.id } },
-        api_key: apiKey,
-        channelName: channelName,
+    const email = formData.get("email") as string;
+    if (!email) {
+      return NextResponse.json(
+        {
+          msg: "Failed to get email address",
+        },
+        { status: 400 }
+      );
+    }
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        editor: true,
       },
     });
 
-    if (!newUser) {
-      return NextResponse.json({
-        msg: "Something went wrong",
-      });
+    console.log(user);
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          msg: "Failed to get user info",
+        },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({
-      msg: "Account Setup Successfull",
+    const profilePicture = formData.get("profilePicture") as string;
+    const description = formData.get("description") as string;
+    const experience = formData.get("experience") as string;
+    const phoneNumber = formData.get("phoneNumber") as string;
+    const country = formData.get("country") as string;
+    const state = formData.get("state") as string;
+    const city = formData.get("city") as string;
+
+    const newEditor = await prisma.editor.create({
+      data: {
+        profile_pic: profilePicture,
+        description: description,
+        experience: experience,
+        phone_number: phoneNumber,
+        country: country,
+        state: state,
+        city: city,
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+      },
     });
+    return NextResponse.json(
+      {
+        msg: "Editor profile created successfully",
+        editor: newEditor,
+      },
+      { status: 201 }
+    );
   } catch (error) {
-    console.error("Error occurred during account setup:", error);
-    return NextResponse.json({
-      error: "Internal Server Error",
-    });
+    console.error("Error creating editor profile:", error);
+    return NextResponse.json(
+      {
+        msg: "Failed to create editor profile",
+      },
+      { status: 500 }
+    );
   }
 };

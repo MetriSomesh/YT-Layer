@@ -37,6 +37,8 @@ model YouTuber {
   accessToken  String   @default("")
   refreshToken String   @default("")
   video        Video?
+  editor       Editor?
+  invitation Invitation?
 }
 
 model Video {
@@ -61,4 +63,16 @@ model Editor {
   country String
   state String
   city String
+  youtuberId Int? @unique
+  youtuber YouTuber? @relation(fields: [youtuberId],references: [id])
+  invitation Invitation[]
+}
+
+model Invitation{
+  id Int @id @default(autoincrement())
+  youtuberId Int @unique
+  youtuber YouTuber @relation(fields: [youtuberId],references: [id])
+  editorId Int @unique
+  editor Editor @relation(fields: [editorId],references: [id])
+  message String
 }

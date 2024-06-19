@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { youtuberId, editorId, message } = body;
+    const { youtuberId, editorId, message, status } = body;
 
     if (!youtuberId || !editorId || !message) {
       return NextResponse.json({ msg: "Fill all the fields" }, { status: 500 });
@@ -22,6 +22,7 @@ export const POST = async (req: NextRequest) => {
           connect: { id: editorId },
         },
         message,
+        status,
       },
       include: {
         youtuber: true,

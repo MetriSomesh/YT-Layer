@@ -75,4 +75,5 @@ model Invitation{
   editorId Int @unique
   editor Editor @relation(fields: [editorId],references: [id])
   message String
+  status String?
 }

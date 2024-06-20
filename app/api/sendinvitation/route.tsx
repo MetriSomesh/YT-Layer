@@ -7,10 +7,15 @@ const prisma = new PrismaClient();
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { youtuberId, editorId, message, status } = body;
+    const { youtuberId, editorId, message } = body;
+    var { status } = body;
 
     if (!youtuberId || !editorId || !message) {
       return NextResponse.json({ msg: "Fill all the fields" }, { status: 500 });
+    }
+
+    if (!status) {
+      status = "pending";
     }
 
     const invitation = await prisma.invitation.create({

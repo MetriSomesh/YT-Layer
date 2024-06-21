@@ -27,7 +27,7 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
   };
 
   return (
-    <div className="container mx-auto p-6 min-h-screen min-w-full bg-gray-900 text-gray-100">
+    <div className="container mx-auto p-6 min-h-screen min-w-ful bg-gray-900 text-gray-100">
       <div className="bg-gray-800 shadow-md rounded-lg p-8">
         <Link href="/addeditor" className="text-blue-400 hover:text-blue-500">
           Back to Search

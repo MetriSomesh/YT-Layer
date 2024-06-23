@@ -15,6 +15,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         { status: 400 }
       );
     }
+    await prisma.$connect();
     const user = await prisma.user.findUnique({
       where: { email },
       include: {
@@ -25,6 +26,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
     console.log(user);
 
     if (!user) {
+      await prisma.$disconnect();
       return NextResponse.json(
         {
           msg: "Failed to get user info",
@@ -57,6 +59,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         },
       },
     });
+    await prisma.$disconnect();
     return NextResponse.json(
       {
         msg: "Editor profile created successfully",
@@ -65,6 +68,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
       { status: 201 }
     );
   } catch (error) {
+    await prisma.$disconnect();
     console.error("Error creating editor profile:", error);
     return NextResponse.json(
       {

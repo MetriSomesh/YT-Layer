@@ -1,16 +1,22 @@
 // app/editor/[id]/EditorDetail.tsx
 "use client";
 
+import { userIdState } from "@/states/userState";
+import { PrismaClient } from "@prisma/client";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { useRecoilState } from "recoil";
 
 interface EditorDetailProps {
   editor: {
     user: {
       username: string;
       email: string;
+      id: number;
     };
-    // profile_pic: string;
+    id: number;
+    profile_pic: string;
     description: string;
     experience: string;
     phone_number: string;
@@ -19,27 +25,46 @@ interface EditorDetailProps {
     city: string;
   };
 }
+const prisma = new PrismaClient();
 
 const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
-  const handleInviteClick = () => {
-    // Handle the invite action here, e.g., send an invite request to the server
-    alert("Invite sent!");
+  const [userId, setUserId] = useRecoilState(userIdState);
+
+  let youtuberId = 0;
+  const handleInviteClick = async () => {
+    const res = await axios.post("http://localhost:3000/api/getYoutuberId", {
+      id: parseInt(userId),
+    });
+
+    youtuberId = res.data.youtuber;
+
+    const newInvitation = await axios.post(
+      "http://localhost:3000/api/sendinvitation",
+      {
+        youtuberId: youtuberId,
+        editorId: editor.id,
+        message: "Wanna work with me?",
+      }
+    );
+
+    console.log(newInvitation);
   };
 
   return (
-    <div className="container mx-auto p-6 min-h-screen min-w-ful bg-gray-900 text-gray-100">
+    <div className=" mx-auto p-6 min-h-screen  bg-gray-900 text-gray-100">
       <div className="bg-gray-800 shadow-md rounded-lg p-8">
         <Link href="/addeditor" className="text-blue-400 hover:text-blue-500">
           Back to Search
         </Link>
         <div className="text-center mt-6">
-          {/* <Image
+          {userId}
+          <Image
             src={editor.profile_pic}
             alt={editor.user.username}
             width={150}
             height={150}
             className="rounded-full mx-auto border-4 border-blue-500"
-          /> */}
+          />
           <h1 className="text-4xl font-bold mt-4 text-blue-400">
             {editor.user.username}
           </h1>

@@ -46,7 +46,7 @@ export default function Signin() {
                   const login = await signIn("credentials", {
                     email,
                     password,
-                    callbackUrl: "/dashboard",
+                    callbackUrl: "/ytdashboard",
                     redirect: false,
                   });
 

@@ -13,7 +13,7 @@ export const Appbar = () => {
       >
         Signin
       </button>
-      {JSON.stringify(session)}
+      {JSON.stringify(session.data)}
     </div>
   );
 };

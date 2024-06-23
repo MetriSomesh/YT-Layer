@@ -33,11 +33,13 @@ const handler = NextAuth({
         password: { label: "password", type: "password", placeholder: "" },
       },
       async authorize(credentials: any) {
+        await prisma.$connect();
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
         if (!user) {
+          await prisma.$disconnect();
           return null;
         }
 
@@ -46,11 +48,12 @@ const handler = NextAuth({
           user.password
         );
         if (!isPasswordValid) {
+          await prisma.$disconnect();
           return null;
         }
 
         const jwtToken = await generateJWT({ id: user.id });
-
+        await prisma.$disconnect();
         return {
           id: user.id.toString(),
           name: user.username,
@@ -70,11 +73,15 @@ const handler = NextAuth({
       }
       return token;
     },
-    async session({ session, token, user }: any) {
-      if (token && user) {
-        session.user.id = token.uid as string;
-        session.user.jwtToken = token.jwtToken as string;
+    async session({ session, token }: any) {
+      if (token) {
+        session.user = {
+          ...session.user,
+          id: token.uid as string,
+          jwtToken: token.jwtToken as string,
+        };
       }
+      console.log(session.user);
       return session;
     },
   },

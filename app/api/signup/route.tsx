@@ -6,18 +6,16 @@ export const POST = async (req: NextRequest) => {
   const body = await req.json();
 
   const { username, email, password, userType } = body;
-
+  await prisma.$connect();
   const existingUser = await prisma.user.findUnique({
     where: { email },
   });
 
   if (existingUser) {
-    await prisma.youTuber.deleteMany();
-
-    await prisma.editor.deleteMany();
-    // Now delete all records from the User table
-    await prisma.user.deleteMany();
-
+    // await prisma.youTuber.deleteMany();
+    // await prisma.editor.deleteMany();
+    // // Now delete all records from the User table
+    // await prisma.user.deleteMany();
     // return NextResponse.json(
     //   {
     //     msg: "Email is already registered",
@@ -38,7 +36,7 @@ export const POST = async (req: NextRequest) => {
         userType,
       },
     });
-
+    await prisma.$disconnect();
     return NextResponse.json(
       {
         msg: "User Created",
@@ -47,6 +45,7 @@ export const POST = async (req: NextRequest) => {
       { status: 201 }
     );
   } catch (error) {
+    await prisma.$disconnect();
     return NextResponse.json(
       {
         error: "Internal Server Error",

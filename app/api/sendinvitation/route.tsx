@@ -12,7 +12,7 @@ export const POST = async (req: NextRequest) => {
     if (!youtuberId || !editorId || !message) {
       return NextResponse.json({ msg: "Fill all the fields" }, { status: 500 });
     }
-
+    await prisma.$connect();
     const invitation = await prisma.invitation.create({
       data: {
         youtuber: {
@@ -31,17 +31,19 @@ export const POST = async (req: NextRequest) => {
     });
 
     if (!invitation) {
+      await prisma.$disconnect();
       return NextResponse.json(
         { msg: "Failed to create invitation instatnce" },
         { status: 400 }
       );
     }
-
+    await prisma.$disconnect();
     return NextResponse.json({
       msg: "Invitation is created sucessfully",
       invitation: invitation,
     });
   } catch (error) {
+    await prisma.$disconnect();
     console.error("Error creating invitation :", error);
     return NextResponse.json(
       {

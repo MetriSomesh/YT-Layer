@@ -1,9 +1,26 @@
+// src/components/DashAppbar.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRecoilState } from "recoil";
+import { userIdState } from "../app/state/userState";
+import { getSession } from "next-auth/react";
 
 export const DashAppbar = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
+  const [userId, setUserId] = useRecoilState(userIdState);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const session = await getSession();
+      if (session && session.user && session.user.id) {
+        setUserId(session.user.id);
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
@@ -11,48 +28,11 @@ export const DashAppbar = () => {
   const toggleMobileMenu = () => {
     setMobileMenuVisible(!mobileMenuVisible);
   };
+
   return (
     <nav className="border-gray-200 bg-gray-900 h-20 mx-auto flex items-center justify-between w-full">
       <div className="md:max-w-screen-2xl mx-auto flex items-center justify-between w-full">
         <div className="text-white text-lg">YT-Layer</div>
-        {/* <div className="text-white w-96 ml-10">
-            <form className=" mt-0">
-              <div className="relative">
-                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                  <svg
-                    className="w-4 h-4  text-gray-400"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                    />
-                  </svg>
-                </div>
-                <input
-                  type="search"
-                  id="default-search"
-                  className="block w-full p-3 ps-10 text-sm  border  rounded-lg    bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Search Mockups, Logos..."
-                  required
-                />
-                <div className="flex items-center text-center">
-                  <button
-                    type="submit"
-                    className="text-white h-8 mb-1 mr-1 absolute end-1 bottom-1 text-center focus:ring-4 focus:outline-none  font-medium rounded-xl text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 focus:ring-blue-800"
-                  >
-                    Search
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div> */}
         <div className=" items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <button
             type="button"

@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import { useState, useEffect, ChangeEvent } from "react";
-
+import { useRouter } from "next/navigation";
 // Define the profile type
 interface Profile {
   id: number;
@@ -25,6 +25,7 @@ interface Profile {
 const mockProfiles: Profile[] = [];
 
 export const SearchEditors = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [profiles, setProfiles] = useState<Profile[]>([]);
 
@@ -40,9 +41,9 @@ export const SearchEditors = () => {
     // );
     // setProfiles(filteredProfiles);
 
-    var res = await axios.post("http://localhost:3000/api/searcheditor", {
-      searchTerm,
-    });
+    // var res = await axios.post("http://localhost:3000/api/searcheditor", {
+    //   searchTerm,
+    // });
   };
   const handleKeyPress = async (e: any) => {
     if (e.keyCode === 13) {
@@ -60,6 +61,9 @@ export const SearchEditors = () => {
       const updatedProfiles = [...profiles, foundProfile];
       setProfiles(updatedProfiles);
     }
+  };
+  const handleCardClick = (id: number) => {
+    router.push(`/editor/${id}`);
   };
 
   return (
@@ -81,6 +85,7 @@ export const SearchEditors = () => {
         {profiles.map((profile) => (
           <div
             key={profile.id}
+            onClick={() => handleCardClick(profile.id)}
             className="bg-white p-6 border border-gray-200 rounded-lg shadow hover:shadow-lg transition-shadow duration-200"
           >
             <h2 className="text-2xl font-bold mb-2 text-gray-900">

@@ -5,10 +5,12 @@ const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   try {
+    await prisma.$connect();
     const body = await req.json();
     const { status, youtuberId, editorId, invitationId } = body;
 
     if (!status || !youtuberId || !editorId || !invitationId) {
+      await prisma.$disconnect();
       return NextResponse.json({ msg: "Unable to pass status", status: 400 });
     }
 
@@ -25,12 +27,13 @@ export const POST = async (req: NextRequest) => {
         });
 
         if (!updatedEditor && !updateInvitation) {
+          await prisma.$disconnect();
           return NextResponse.json({
             msg: "Unable to update data into Table",
             status: 400,
           });
         }
-
+        await prisma.$disconnect();
         return NextResponse.json({
           msg: "Invitaion accepted",
           editor: updatedEditor,
@@ -38,6 +41,7 @@ export const POST = async (req: NextRequest) => {
           status: 200,
         });
       } catch (error) {
+        await prisma.$disconnect();
         console.error("Error updating editor:", error);
         return NextResponse.json({
           msg: "Failed to accept invitation",
@@ -49,7 +53,7 @@ export const POST = async (req: NextRequest) => {
         const updateInvitation = await prisma.invitation.delete({
           where: { id: invitationId },
         });
-
+        await prisma.$disconnect();
         return NextResponse.json({
           msg: "Invitaion rejected",
 
@@ -57,6 +61,7 @@ export const POST = async (req: NextRequest) => {
           status: 200,
         });
       } catch (error) {
+        await prisma.$disconnect();
         console.error("Error updating editor:", error);
         return NextResponse.json({
           msg: "Failed to accept invitation",
@@ -67,6 +72,7 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ msg: "Invalid status", status: 400 });
     }
   } catch (error) {
+    await prisma.$disconnect();
     console.error("Error updating editor:", error);
     return NextResponse.json({
       msg: "Failed to accept invitation",

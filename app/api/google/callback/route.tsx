@@ -42,7 +42,7 @@ export const GET = async (req: NextRequest) => {
     // const user = await prisma.user.findFirst({
     //   where: { id: req.user.id }, // Assuming you have the authenticated user's id in req.user
     // });
-
+    await prisma.$connect();
     const user = await prisma.user.findFirst({
       where: {
         email: userEmail,
@@ -63,9 +63,10 @@ export const GET = async (req: NextRequest) => {
 
       console.log("refresh Token", refreshToken);
     }
-
+    await prisma.$disconnect();
     return NextResponse.redirect("http://localhost:3000/signin");
   } catch (error) {
+    await prisma.$disconnect();
     console.error(
       "Error exchanging authorization code for access token:",
       error

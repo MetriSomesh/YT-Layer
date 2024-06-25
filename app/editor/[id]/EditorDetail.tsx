@@ -33,7 +33,7 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
   let youtuberId = 0;
   const handleInviteClick = async () => {
     const res = await axios.post("http://localhost:3000/api/getYoutuberId", {
-      id: parseInt(userId),
+      id: 140,
     });
 
     youtuberId = res.data.youtuber;
@@ -41,7 +41,7 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
     const newInvitation = await axios.post(
       "http://localhost:3000/api/sendinvitation",
       {
-        youtuberId: youtuberId,
+        youtuberId: 17,
         editorId: editor.id,
         message: "Wanna work with me?",
       }

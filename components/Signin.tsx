@@ -1,6 +1,6 @@
 "use client";
 
-import { UserType } from "@prisma/client";
+import { PrismaClient, UserType } from "@prisma/client";
 import axios from "axios";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -9,12 +9,9 @@ import { useState } from "react";
 export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const userType =
-    typeof localStorage !== "undefined" &&
-    localStorage.getItem("userType") === "YOUTUBER"
-      ? UserType.YOUTUBER
-      : UserType.EDITOR;
+  let userType = "YOUTUBER";
   const router = useRouter();
+  const prisma = new PrismaClient();
 
   return (
     <div className="h-screen flex justify-center flex-col">
@@ -43,15 +40,33 @@ export default function Signin() {
               />
               <button
                 onClick={async () => {
-                  const login = await signIn("credentials", {
-                    email,
-                    password,
-                    callbackUrl: "/ytdashboard",
-                    redirect: false,
-                  });
+                  userType = await axios.post(
+                    "http://localhost:3000/api/getUserType",
+                    {
+                      email,
+                    }
+                  );
 
-                  if (login?.ok) {
-                    router.push(login.url || "");
+                  if (userType === "YOUTUBER") {
+                    const login = await signIn("credentials", {
+                      email,
+                      password,
+                      callbackUrl: "/ytdashboard",
+                      redirect: false,
+                    });
+                    if (login?.ok) {
+                      router.push(login.url || "");
+                    }
+                  } else {
+                    const login = await signIn("credentials", {
+                      email,
+                      password,
+                      callbackUrl: "/eddashboard",
+                      redirect: false,
+                    });
+                    if (login?.ok) {
+                      router.push(login.url || "");
+                    }
                   }
                 }}
                 type="button"

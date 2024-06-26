@@ -1,14 +1,15 @@
-// src/components/DashAppbar.tsx
 "use client";
 import { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { userIdState } from "../app/state/userState";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export const DashAppbar = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [userId, setUserId] = useRecoilState(userIdState);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -29,11 +30,16 @@ export const DashAppbar = () => {
     setMobileMenuVisible(!mobileMenuVisible);
   };
 
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
+    router.push("/signin");
+  };
+
   return (
     <nav className="border-gray-200 bg-gray-900 h-20 mx-auto flex items-center justify-between w-full">
       <div className="md:max-w-screen-2xl mx-auto flex items-center justify-between w-full">
         <div className="text-white text-lg">YT-Layer</div>
-        <div className=" items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+        <div className="items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           <button
             type="button"
             className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-600"
@@ -52,7 +58,7 @@ export const DashAppbar = () => {
           {dropdownVisible && (
             <div
               id="dropdownNavbar"
-              className="absolute z-10 font-normal  divide-y  rounded-lg shadow w-44 bg-gray-700 divide-gray-600"
+              className="absolute z-10 font-normal divide-y rounded-lg shadow w-44 bg-gray-700 divide-gray-600"
             >
               <ul
                 className="py-2 text-sm text-gray-700 dark:text-gray-400"
@@ -85,6 +91,7 @@ export const DashAppbar = () => {
               </ul>
               <div className="py-1">
                 <a
+                  onClick={handleSignOut}
                   href="#"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                 >

@@ -22,6 +22,11 @@ export const POST = async (req: NextRequest) => {
       await prisma.$disconnect();
       return NextResponse.json({ msg: "Invitation not found ", status: 404 });
     }
+
+    if (Isinvitation.invitation[0].status === "Accepted") {
+      await prisma.$disconnect();
+      return NextResponse.json({ msg: "Invitation not found ", status: 404 });
+    }
     await prisma.$disconnect();
     return NextResponse.json({
       msg: "Invitation Found",

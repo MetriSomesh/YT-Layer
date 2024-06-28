@@ -1,12 +1,13 @@
 "use client";
 import { ChannelCard } from "@/components/ChannelCard";
-import { DashAppbar } from "@/components/DashAppbar";
+
 import { EditorCard } from "@/components/EditorCard";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { userIdState } from "../state/userState";
 import { getSession } from "next-auth/react";
+import { EDashAppbar } from "@/components/EDDashAppBar";
 
 export default function DashBoard() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -47,7 +48,7 @@ export default function DashBoard() {
 
   return (
     <div className="h-screen bg-slate-200">
-      <DashAppbar />
+      <EDashAppbar />
       <div className="h-52">{userId}</div>
     </div>
   );

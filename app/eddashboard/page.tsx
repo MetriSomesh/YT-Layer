@@ -8,11 +8,12 @@ import { useRecoilState } from "recoil";
 import { userIdState } from "../state/userState";
 import { getSession } from "next-auth/react";
 import { EDashAppbar } from "@/components/EDDashAppBar";
+import { notificationState } from "../state/notificationState";
 
 export default function DashBoard() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
-  const [notification, setNotification] = useState([]);
+  const [notification, setNotification] = useRecoilState(notificationState);
   const [userId, setUserId] = useRecoilState(userIdState);
 
   const getNotification = async () => {
@@ -25,6 +26,9 @@ export default function DashBoard() {
     const res = await axios.post("http://localhost:3000/api/checkinvitation", {
       editorId: secondId,
     });
+    if (res) {
+      setNotification(res.data.invitation);
+    }
   };
   useEffect(() => {
     const fetchUserId = async () => {
@@ -44,6 +48,7 @@ export default function DashBoard() {
         console.log(userId);
       }
     }, 10000);
+    //10000f
   }, [userId]);
 
   return (

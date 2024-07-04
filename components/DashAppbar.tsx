@@ -4,11 +4,13 @@ import { useRecoilState } from "recoil";
 import { userIdState } from "../app/state/userState";
 import { getSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export const DashAppbar = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [userId, setUserId] = useRecoilState(userIdState);
+  const [youtuberId, setYoutuberId] = useState();
   const router = useRouter();
 
   useEffect(() => {
@@ -21,6 +23,37 @@ export const DashAppbar = () => {
 
     fetchUserId();
   }, []);
+
+  useEffect(() => {
+    const fetchYoutuberId = async () => {
+      const getYotuberId = await axios.post(
+        "http://localhost:3000/api/getYoutuberId",
+        {
+          id: parseInt(userId || ""),
+        }
+      );
+      if (getYotuberId) {
+        setYoutuberId(getYotuberId.data.youtuber);
+      }
+    };
+    fetchYoutuberId();
+  }, [userId]);
+
+  useEffect(() => {
+    const createChannel = async () => {
+      const newChannel = await axios.post(
+        "http://localhost:3000/api/channelinfo",
+        {
+          youtuberId: youtuberId,
+        }
+      );
+
+      if (newChannel) {
+        console.log(newChannel);
+      }
+    };
+    createChannel();
+  }, [youtuberId]);
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);

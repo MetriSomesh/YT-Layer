@@ -47,6 +47,7 @@ export const POST = async (req: NextRequest) => {
     );
   } catch (error) {
     await prisma.$disconnect();
+    console.error(error);
     return NextResponse.json(
       {
         error: "Internal Server Error",

@@ -15,9 +15,16 @@ export const POST = async (req: NextRequest) => {
     await prisma.$connect();
     const Isinvitation = await prisma.editor.findUnique({
       where: { id: editorId },
-      include: { invitation: true },
+      include: {
+        invitation: {
+          include: {
+            channel: true,
+          },
+        },
+      },
     });
 
+    console.log(Isinvitation);
     if (!Isinvitation) {
       await prisma.$disconnect();
       return NextResponse.json({ msg: "Invitation not found ", status: 404 });

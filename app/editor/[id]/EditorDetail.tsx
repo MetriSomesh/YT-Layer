@@ -33,22 +33,41 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
   const handleInviteClick = async () => {
     setLoading(true);
     try {
+      const uId = await parseInt(userId);
       const res = await axios.post("http://localhost:3000/api/getYoutuberId", {
-        id: parseInt(userId),
+        id: uId,
       });
-      const youtuberId = res.data.youtuber;
+      const youtuberId = parseInt(res.data.youtuber);
 
-      const newInvitation = await axios.post(
-        "http://localhost:3000/api/sendinvitation",
+      const channelInfo = await axios.post(
+        "http://localhost:3000/api/getChannelInfo",
         {
-          youtuberId: youtuberId,
-          editorId: editor.id,
-          message: "Wanna work with me?",
+          id: youtuberId,
         }
       );
+      if (channelInfo) {
+        const newInvitation = await axios.post(
+          "http://localhost:3000/api/sendinvitation",
+          {
+            youtuberId: youtuberId,
+            editorId: editor.id,
+            message: `${channelInfo.data.channelInfo.title} has invited you! `,
+            status: "pending",
+          }
+        );
 
-      if (newInvitation.status === 200) {
-        setIsinvitationSent(true);
+        if (newInvitation.status === 200) {
+          const channelConnect = await axios.post(
+            "http://localhost:3000/api/connectChannel",
+            {
+              id: youtuberId,
+            }
+          );
+
+          if (channelConnect.status === 200) {
+            setIsinvitationSent(true);
+          }
+        }
       }
     } catch (error) {
       console.error(`Error occurred: ${error}`);

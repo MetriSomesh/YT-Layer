@@ -19,7 +19,7 @@ enum UserType {
 }
 
 model User{
-  id Int @id @default(autoincrement())
+  id         Int    @id @default( autoincrement())
   username String
   email String @unique
   password String
@@ -31,31 +31,48 @@ model User{
 
 
 model YouTuber {
-  id           Int      @id @default(autoincrement())
-  userId       Int      @unique
-  user         User     @relation(fields: [userId],references: [id])
-  accessToken  String   @default("")
-  refreshToken String   @default("")
+  id           Int       @id @default(autoincrement())
+  userId       Int       @unique
+  user         User      @relation(fields: [userId], references: [id])
+  accessToken  String    @default("")
+  refreshToken String    @default("")
   video        Video?
   editor       Editor?
+  invitation   Invitation?
+  channel      Channel?
+}
+
+model Channel {
+  id               Int       @id @default(autoincrement())
+  youtuberId       Int       @unique
+  youtuber         YouTuber  @relation(fields: [youtuberId], references: [id])
+  channelId        String
+  title            String
+  ChannelPic       String
+  description      String?
+  viewCount        String
+  subscriberCount  String
+  hiddenSubsCount  Boolean?
+  videoCount       String?
   invitation Invitation?
 }
 
+
 model Video {
-  id          Int      @id @default(autoincrement())
+  id         Int    @id @default( autoincrement())
   title       String
   description String
   status      String
   tags        String
   url         String
-  youtuberId  Int @unique
-  youtuber    YouTuber @relation(fields: [youtuberId],references: [id])
+  youtuberId  Int? @unique
+  youtuber    YouTuber? @relation(fields: [youtuberId],references: [id])
 }
 
 model Editor {
-  id        Int     @id @default(autoincrement())
-  userId    Int     @unique
-  user      User    @relation(fields: [userId], references: [id])
+  id         Int    @id @default( autoincrement())
+  userId    Int?     @unique
+  user      User?    @relation(fields: [userId], references: [id])
   profile_pic String @unique
   description String
   experience String
@@ -69,11 +86,13 @@ model Editor {
 }
 
 model Invitation{
-  id Int @id @default(autoincrement())
-  youtuberId Int @unique
-  youtuber YouTuber @relation(fields: [youtuberId],references: [id])
-  editorId Int @unique
-  editor Editor @relation(fields: [editorId],references: [id])
+  id         Int    @id @default( autoincrement())
+  youtuberId Int? @unique
+  youtuber YouTuber? @relation(fields: [youtuberId],references: [id])
+  editorId Int? @unique
+  editor Editor? @relation(fields: [editorId],references: [id])
+ channelId   Int?    @unique
+  channel     Channel? @relation(fields: [channelId], references: [id])
   message String
   status String?
 }

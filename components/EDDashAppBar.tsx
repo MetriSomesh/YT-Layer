@@ -18,19 +18,13 @@ import profile from "../assets/user.svg";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { notificationState } from "@/app/state/notificationState";
@@ -43,6 +37,7 @@ export const EDashAppbar = () => {
   const [userId, setUserId] = useRecoilState(userIdState);
   const [notification, setNotification] = useRecoilState(notificationState);
   const router = useRouter();
+
   useEffect(() => {
     const fetchUserId = async () => {
       const session = await getSession();
@@ -80,6 +75,11 @@ export const EDashAppbar = () => {
     router.push("/signin");
   };
 
+  const navigateToInvitation = (channelId: string) => {
+    // Implement navigation logic here
+    console.log("Navigating to invitation with channelId:", channelId);
+  };
+
   return (
     <nav className="border-gray-200 bg-gray-900 h-20 mx-auto flex items-center justify-between w-full">
       <div className="md:max-w-screen-2xl mx-auto flex items-center justify-between w-full">
@@ -88,7 +88,7 @@ export const EDashAppbar = () => {
           <DropdownMenu onOpenChange={hasNewNotification}>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon" className="relative">
-                <Image src={notificationIcon} alt={"Notifications"} />
+                <Image src={notificationIcon} alt="Notifications" />
 
                 {hasNewNotifications && (
                   <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
@@ -103,6 +103,8 @@ export const EDashAppbar = () => {
                   notification.invitation.map(
                     (
                       inv: {
+                        channelId: string;
+                        channel: { ChannelPic: string | undefined };
                         message:
                           | string
                           | number
@@ -120,8 +122,21 @@ export const EDashAppbar = () => {
                       },
                       index: Key | null | undefined
                     ) => (
-                      <DropdownMenuItem key={index}>
+                      <DropdownMenuItem
+                        key={index}
+                        onClick={() => navigateToInvitation(inv.channelId)}
+                      >
+                        <Avatar>
+                          <AvatarImage src={inv.channel?.ChannelPic} />
+                          <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
                         {inv.message}
+                        <Button
+                          onClick={() => navigateToInvitation(inv.channelId)}
+                          className="ml-auto"
+                        >
+                          View
+                        </Button>
                       </DropdownMenuItem>
                     )
                   )
@@ -135,7 +150,7 @@ export const EDashAppbar = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon" className="relative">
-                <Image src={profile} alt={"profile"} />
+                <Image src={profile} alt="profile" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">

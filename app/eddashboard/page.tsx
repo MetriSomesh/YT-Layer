@@ -11,8 +11,6 @@ import { EDashAppbar } from "@/components/EDDashAppBar";
 import { notificationState } from "../state/notificationState";
 
 export default function DashBoard() {
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [notification, setNotification] = useRecoilState(notificationState);
   const [userId, setUserId] = useRecoilState(userIdState);
 
@@ -22,7 +20,7 @@ export default function DashBoard() {
       id: id,
     });
     console.log("Editor found : ", editorId);
-    const secondId = editorId.data.editor;
+    const secondId = parseInt(editorId.data.editor);
     const res = await axios.post("http://localhost:3000/api/checkinvitation", {
       editorId: secondId,
     });

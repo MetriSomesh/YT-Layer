@@ -31,7 +31,7 @@ export const GET = async (req: NextRequest) => {
     const refreshToken = tokens.refresh_token;
     oAuth2Client.setCredentials(tokens);
 
-    console.log("Tokens asdklfj : ", tokens.refresh_token);
+    // console.log("Tokens asdklfj : ", tokens.refresh_token);
 
     const { data } = await google
       .oauth2({ version: "v2", auth: oAuth2Client })
@@ -62,6 +62,67 @@ export const GET = async (req: NextRequest) => {
       });
 
       console.log("refresh Token", refreshToken);
+
+      const youtube = google.youtube({
+        version: "v3",
+        auth: oAuth2Client,
+      });
+      const channelResponse = await youtube.channels.list({
+        part: ["snippet", "contentDetails", "statistics"],
+        mine: true,
+      });
+
+      // const channelInfo = channelResponse.data.items?.[0];
+      // if (channelInfo) {
+      //   console.log("YouTube Channel Info:", channelInfo);
+      //   const profilePicture = channelInfo?.snippet?.thumbnails?.default?.url;
+      //   console.log("Profile Picture URL:", profilePicture);
+      //   try {
+      //     await prisma.$connect();
+      //     if (user) {
+      //       const youtuberId = await prisma.youTuber.findUnique({
+      //         where: {
+      //           userId: user.id,
+      //         },
+      //         select: {
+      //           id: true,
+      //         },
+      //       });
+      //       if (youtuberId) {
+      //         console.log("youtuber id", youtuberId);
+      //         const channels = await prisma.channel.create({
+      //           data: {
+      //             youtuber: { connect: { id: youtuberId.id } },
+      //             channelId: channelInfo.id!,
+      //             title: channelInfo.snippet?.title?.toString() || "",
+      //             ChannelPic:
+      //               channelInfo.snippet?.thumbnails?.default?.url?.toString() ||
+      //               "",
+      //             description:
+      //               channelInfo.snippet?.description?.toString() || "",
+      //             viewCount:
+      //               channelInfo.statistics?.viewCount?.toString() || "",
+      //             videoCount:
+      //               channelInfo.statistics?.videoCount?.toString() || "",
+      //             subscriberCount:
+      //               channelInfo.statistics?.subscriberCount?.toString() || "",
+      //             hiddenSubsCount:
+      //               channelInfo.statistics?.hiddenSubscriberCount || false,
+      //           },
+      //         });
+      //         await prisma.$disconnect();
+      //         console.log("Channel created");
+      //       }
+      //     } else {
+      //       console.log("user not found for the channle");
+      //     }
+      //   } catch (error) {
+      //     await prisma.$disconnect();
+      //     console.error(error);
+      //   }
+      // } else {
+      //   console.log("No channel info found");
+      // }
     }
     await prisma.$disconnect();
     return NextResponse.redirect("http://localhost:3000/signin");

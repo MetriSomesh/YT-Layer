@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
-
   const { editorId } = body;
 
   if (!editorId) {
@@ -14,14 +13,19 @@ export const POST = async (req: NextRequest) => {
 
   try {
     await prisma.$connect();
-    const Isinvitation = await prisma.editor.findUnique({
+    const Isinvitation = await prisma.editor.findMany({
       where: { id: editorId },
       include: {
-        invitation: true,
+        invitation: {
+          include: {
+            channel: true,
+          },
+        },
       },
     });
 
-    if (!Isinvitation) {
+    console.log(Isinvitation);
+    if (Isinvitation.length === 0) {
       await prisma.$disconnect();
       return NextResponse.json(
         { msg: "Invitation not found" },
@@ -29,13 +33,10 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    if (Isinvitation.invitation[0]?.viewed === true) {
-      await prisma.$disconnect();
-      return NextResponse.json(
-        { msg: "Invitation already viewed" },
-        { status: 404 }
-      );
-    }
+    // if (Isinvitation.invitation[0].status === "Accepted") {
+    //   await prisma.$disconnect();
+    //   return NextResponse.json({ msg: "Invitation not found" }, { status: 404 });
+    // }
 
     await prisma.$disconnect();
     return NextResponse.json(
@@ -47,10 +48,10 @@ export const POST = async (req: NextRequest) => {
     );
   } catch (error) {
     await prisma.$disconnect();
-    console.error("Error checking invitation:", error);
+    console.error("Error updating editor:", error);
     return NextResponse.json(
       {
-        msg: "Failed to check invitation",
+        msg: "Failed to accept invitation",
       },
       { status: 500 }
     );

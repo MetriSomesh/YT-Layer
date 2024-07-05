@@ -95,4 +95,5 @@ model Invitation{
   channel     Channel? @relation(fields: [channelId], references: [id])
   message String
   status String?
+  viewed Boolean @default(false)
 }

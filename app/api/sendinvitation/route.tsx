@@ -13,6 +13,21 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ msg: "Fill all the fields" }, { status: 500 });
     }
     await prisma.$connect();
+
+    const isInvitationExists = await prisma.invitation.findUnique({
+      where: {
+        youtuberId: youtuberId,
+      },
+    });
+
+    if (isInvitationExists) {
+      return NextResponse.json(
+        {
+          msg: "Invitation already sent",
+        },
+        { status: 201 }
+      );
+    }
     const invitation = await prisma.invitation.create({
       data: {
         youtuber: {

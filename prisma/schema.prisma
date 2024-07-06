@@ -40,6 +40,7 @@ model YouTuber {
   editor       Editor?
   invitation   Invitation?
   channel      Channel?
+  notification YouTuberNotification?
 }
 
 model Channel {
@@ -83,6 +84,7 @@ model Editor {
   youtuberId Int? @unique
   youtuber YouTuber? @relation(fields: [youtuberId],references: [id])
   invitation Invitation[]
+  ytnotification YouTuberNotification?
 }
 
 model Invitation{
@@ -94,6 +96,16 @@ model Invitation{
  channelId   Int?    @unique
   channel     Channel? @relation(fields: [channelId], references: [id])
   message String
+  status String?
+  viewed Boolean @default(false)
+}
+
+model YouTuberNotification{
+  id Int @id @default(autoincrement())
+  youtuberId Int? @unique
+  youtuber YouTuber? @relation(fields: [youtuberId],references: [id])
+  editorId Int? @unique
+  editor Editor? @relation(fields: [editorId],references: [id])
   status String?
   viewed Boolean @default(false)
 }

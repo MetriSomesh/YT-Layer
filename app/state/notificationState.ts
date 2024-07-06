@@ -12,10 +12,8 @@ interface Notification {
   state: string;
   city: string;
   youtuberId: number | null;
-  invitation: Invitation;
-  // Add other properties as needed
+  invitation: Invitation[]; // Change this to an array of Invitation
 }
-
 interface Invitation {
   [x: string]: any;
   id: number | null;
@@ -23,9 +21,21 @@ interface Invitation {
   editorId: number | null;
   message: string;
   status: string | null;
+  viewed: boolean | null;
+  channel: Channel;
+}
+interface Channel {
+  ChannelPic: string | null;
+  channelId: string | null;
+  videoCount: string | null;
+  viewCount: string | null;
+  title: string | null;
+  description: string | null;
+  subscriberCount: string | null;
+  hiddenSubsCount: boolean | null;
 }
 
-export const notificationState = atom<Notification | null>({
+export const notificationState = atom<Notification[] | null>({
   key: "notificationState",
   default: null,
 });

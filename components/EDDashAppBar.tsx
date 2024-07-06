@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { notificationState } from "@/app/state/notificationState";
 import { newnotificationState } from "@/app/state/newnotificationState";
+import { channelInfoState } from "@/app/state/channelInfoState";
 import axios from "axios";
 import { editorIdState } from "@/app/state/editorIdState";
 
@@ -72,12 +73,12 @@ export const EDashAppbar = () => {
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [notificationMenuVisible, setNotificationMenuVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [invitations, setInvitations] = useState<Invitation[] | null>(null);
   const [hasNewNotifications, setHasNewNotifications] =
     useRecoilState(newnotificationState);
   const [userId, setUserId] = useRecoilState(userIdState);
   const [editorId, setEditorId] = useRecoilState(editorIdState);
-  const [notification, setNotification] = useRecoilState(notificationState);
+  const [allInvitations, setAllInvitations] = useRecoilState(notificationState);
+  const [channelInfo, setChannelInfo] = useRecoilState(channelInfoState);
   const router = useRouter();
 
   useEffect(() => {
@@ -91,12 +92,50 @@ export const EDashAppbar = () => {
     fetchUserId();
   }, []);
 
-  const toggleDropdown = () => {
-    setDropdownVisible(!dropdownVisible);
-  };
+  useEffect(() => {
+    const fetchAllInvitations = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/api/getinvitation",
+          {
+            editorId: editorId,
+          }
+        );
 
-  const toggleMobileMenu = () => {
-    setMobileMenuVisible(!mobileMenuVisible);
+        if (response.status === 200) {
+          console.log("Fetched invitations:", response.data);
+          setAllInvitations(response.data.invitation);
+        }
+      } catch (error) {
+        console.error("Error fetching invitations:", error);
+      }
+    };
+    if (editorId) {
+      fetchAllInvitations();
+    }
+  }, [editorId]);
+
+  const handleViewClick = async (invitationId: number) => {
+    const markInvitation = await axios.post(
+      "http://localhost:3000/api/invimarkasread",
+      {
+        invitationId: invitationId,
+      }
+    );
+
+    if (markInvitation.status !== 200) {
+      const markInvitation = await axios.post(
+        "http://localhost:3000/api/invimarkasread",
+        {
+          invitationId: invitationId,
+        }
+      );
+      if (markInvitation.status === 200) {
+        console.log("marked invitation as read in second attempt");
+      }
+    } else {
+      console.log("marked invitation as read");
+    }
   };
 
   const hasNewNotification = async () => {
@@ -110,7 +149,11 @@ export const EDashAppbar = () => {
           }
         );
         if (response.status === 200) {
-          setInvitations(response.data.invitation);
+          
+          setAllInvitations((prevInvitations) => {
+            if (!prevInvitations) return response.data;
+            return [...prevInvitations, ...response.data];
+          });
         }
       } catch (error) {
         console.error("Failed to fetch invitations:", error);
@@ -123,12 +166,13 @@ export const EDashAppbar = () => {
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
+    // router.push("/signin");
     router.push("/signin");
   };
 
-  const navigateToInvitation = (channelId: string) => {
-    // Implement navigation logic here
-    console.log("Navigating to invitation with channelId:", channelId);
+  const navigateToYoutuberDetail = (channelId: string) => {
+    // router.push(`/youtuber/${channelId}`);
+    router.push(`/youtuber/${channelId}`);
   };
 
   return (
@@ -153,37 +197,57 @@ export const EDashAppbar = () => {
                 <Spinner />
               ) : (
                 <DropdownMenuGroup>
-                  {invitations && invitations.length > 0 ? (
-                    invitations.map((inv, index) =>
-                      inv.invitation.map((detail, subIndex) => (
-                        <DropdownMenuItem
-                          className="gap-4"
-                          key={`${index}-${subIndex}`}
-                          onClick={() =>
-                            navigateToInvitation(detail.channel.channelId)
-                          }
-                        >
-                          <Avatar>
-                            <AvatarImage src={detail.channel.ChannelPic} />
-                            <AvatarFallback>CN</AvatarFallback>
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <span>{detail.message}</span>
-                          </div>
-                          <Button
-                            onClick={() =>
-                              navigateToInvitation(detail.channel.channelId)
-                            }
-                            className="ml-auto"
+                  {allInvitations && allInvitations.length > 0
+                    ? (console.log(allInvitations),
+                      allInvitations.flatMap((inv, index) =>
+                        inv.invitation.map((detail, subIndex) => (
+                          <DropdownMenuItem
+                            className={`gap-4 ${
+                              detail.viewed
+                                ? "text-gray-500"
+                                : "font-bold text-white"
+                            }`}
+                            key={`${index}-${subIndex}`}
+                            onClick={() => {
+                              // if (detail.channel.channelId) {
+                              //   navigateToYoutuberDetail(
+                              //     detail.channel.channelId
+                              //   );
+                              // }
+                            }}
                           >
-                            View
-                          </Button>
-                        </DropdownMenuItem>
+                            <Avatar>
+                              <AvatarImage
+                                src={detail.channel.ChannelPic || undefined}
+                              />
+                              <AvatarFallback>CN</AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <span>{detail.message}</span>
+                            </div>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setChannelInfo(detail.channel);
+                                console.log(detail.channel);
+                                if (detail.viewed == false) {
+                                  handleViewClick(detail.id || 0);
+                                }
+                                if (detail.channel.channelId) {
+                                  navigateToYoutuberDetail(
+                                    detail.channel.channelId as string
+                                  );
+                                }
+                              }}
+                              className="ml-auto"
+                            >
+                              View
+                            </Button>
+                          </DropdownMenuItem>
+                        ))
                       ))
-                    )
-                  ) : (
-                    <DropdownMenuItem>No invitations</DropdownMenuItem>
-                  )}
+                    : (console.log(allInvitations),
+                      (<DropdownMenuItem>No invitations</DropdownMenuItem>))}
                 </DropdownMenuGroup>
               )}
             </DropdownMenuContent>

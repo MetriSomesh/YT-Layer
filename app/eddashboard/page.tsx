@@ -13,7 +13,6 @@ import { newnotificationState } from "../state/newnotificationState";
 import { editorIdState } from "../state/editorIdState";
 
 export default function DashBoard() {
-  const [notification, setNotification] = useRecoilState(notificationState);
   const [hasNewNotifications, setHasNewNotifications] =
     useRecoilState(newnotificationState);
   const [userId, setUserId] = useRecoilState(userIdState);

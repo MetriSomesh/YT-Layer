@@ -1,39 +1,44 @@
 "use client";
-
+import React from "react";
+import { useRecoilState } from "recoil";
 import { userIdState } from "@/states/userState";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useRecoilState } from "recoil";
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+}
+
+interface Editor {
+  id: number;
+  profile_pic: string;
+  description: string;
+  experience: string;
+  phone_number: string;
+  country: string;
+  state: string;
+  city: string;
+  user: User | null; // Allow user to be null
+}
 
 interface EditorDetailProps {
-  editor: {
-    user: {
-      username: string;
-      email: string;
-      id: number;
-    };
-    id: number;
-    profile_pic: string;
-    description: string;
-    experience: string;
-    phone_number: string;
-    country: string;
-    state: string;
-    city: string;
-  };
+  editor: Editor;
 }
 
 const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
   const [userId, setUserId] = useRecoilState(userIdState);
-  const [isInvitationSent, setIsinvitationSent] = useState(false);
+  const [isInvitationSent, setIsInvitationSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [statusCode, setStatusCode] = useState(false);
 
   const handleInviteClick = async () => {
     setLoading(true);
     try {
-      const uId = await parseInt(userId);
+      const uId = parseInt(userId);
       const res = await axios.post("http://localhost:3000/api/getYoutuberId", {
         id: uId,
       });
@@ -65,8 +70,11 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
           );
 
           if (channelConnect.status === 200) {
-            setIsinvitationSent(true);
+            setIsInvitationSent(true);
           }
+        } else if (newInvitation.status === 201) {
+          setStatusCode(true);
+          setIsInvitationSent(true);
         }
       }
     } catch (error) {
@@ -86,13 +94,13 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
           {userId}
           <Image
             src={editor.profile_pic}
-            alt={editor.user.username}
+            alt={editor.user?.username || "Editor Profile Picture"}
             width={150}
             height={150}
             className="rounded-full mx-auto border-4 border-blue-500"
           />
           <h1 className="text-4xl font-bold mt-4 text-blue-400">
-            {editor.user.username}
+            {editor.user?.username || "No Username"}
           </h1>
           <p className="text-gray-300 mt-2">{editor.description}</p>
         </div>
@@ -106,7 +114,9 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
               Contact Information
             </h2>
             <p className="text-gray-300 mt-2">Phone: {editor.phone_number}</p>
-            <p className="text-gray-300">Email: {editor.user.email}</p>
+            <p className="text-gray-300">
+              Email: {editor.user?.email || "No Email"}
+            </p>
           </div>
           <div>
             <h2 className="text-2xl font-bold text-blue-400">Location</h2>
@@ -143,7 +153,11 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
                 ></path>
               </svg>
             ) : isInvitationSent ? (
-              "Invitation Sent!"
+              statusCode ? (
+                "Already invited!"
+              ) : (
+                "Invitation sent!"
+              )
             ) : (
               "Invite"
             )}

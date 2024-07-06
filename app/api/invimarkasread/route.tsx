@@ -5,43 +5,50 @@ const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
-  const { editorId } = body;
+  const { invitationId } = body;
 
-  if (!editorId) {
+  if (!invitationId) {
     return NextResponse.json({ msg: "Invalid request" }, { status: 400 });
   }
 
   try {
     await prisma.$connect();
-    const invitations = await prisma.invitation.findMany({
+    const invitation = await prisma.invitation.update({
       where: {
-        editorId: editorId,
-        viewed: false,
+        id: invitationId,
       },
-      include: {
-        channel: true,
+      data: {
+        viewed: true,
       },
     });
 
     await prisma.$disconnect();
 
-    if (invitations.length === 0) {
-      return NextResponse.json({ msg: "No new invitations" }, { status: 201 });
+    if (invitation.viewed === false) {
+      return NextResponse.json(
+        {
+          msg: "Failed mark as read",
+        },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json(
       {
-        msg: "Invitation Found",
-        invitation: invitations,
+        msg: "Invitation is marked as read",
+        invitation: invitation,
       },
       { status: 200 }
     );
   } catch (error) {
     await prisma.$disconnect();
-    console.error("Error checking invitation:", error);
+    console.error(
+      "Error occured while trying invitation to mark as read:",
+      error
+    );
     return NextResponse.json(
       {
-        msg: "Failed to check invitation",
+        msg: "Failed to mark as read",
       },
       { status: 500 }
     );

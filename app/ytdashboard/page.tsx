@@ -10,6 +10,8 @@ import { youtuberIdState } from "../state/youtuberIdState";
 import { getSession } from "next-auth/react";
 import { userIdState } from "../state/userState";
 import { ytnotificationState } from "../state/ytnotificationState";
+import { VideoCard } from "@/components/VideoCard";
+import { assignedEditorInfoState } from "../state/assignedEditorInfoState";
 
 export default function DashBoard() {
   const [newYtNotification, setNewYtNotification] = useRecoilState(
@@ -19,6 +21,7 @@ export default function DashBoard() {
   const [userId, setUserId] = useRecoilState(userIdState);
   const [ytNotification, setYtNotification] =
     useRecoilState(ytnotificationState);
+  const [editorInfo, setEditorInfo] = useRecoilState(assignedEditorInfoState);
   useEffect(() => {
     const fetchUserId = async () => {
       const session = await getSession();
@@ -39,6 +42,25 @@ export default function DashBoard() {
 
     fetchUserId();
   }, []);
+
+  useEffect(() => {
+    const fetchEditor = async () => {
+      const editorInfo = await axios.post(
+        "http://localhost:3000/api/isEditorAssigned",
+        {
+          id: youtuberId,
+        }
+      );
+
+      if (editorInfo.data.editor) {
+        setEditorInfo(editorInfo.data.editor);
+        console.log(editorInfo.data.editor);
+      }
+    };
+
+    fetchEditor();
+  }, [youtuberId]);
+
   const checkNewNotification = async () => {
     const res = await axios.post(
       "http://localhost:3000/api/checkytnotification",
@@ -68,7 +90,7 @@ export default function DashBoard() {
       <DashAppbar />
       <div className="h-52"></div>
       <div className="w-full  mt-5 flex h-56 gap-96 justify-evenly">
-        <EditorCard />
+        {editorInfo?.youtuberId === youtuberId ? <VideoCard /> : <EditorCard />}
 
         <ChannelCard />
       </div>

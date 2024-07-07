@@ -14,7 +14,7 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ msg: "Bad request", status: 400 });
     }
 
-    if (status === "rejected") {
+    if (status === "Rejected") {
       try {
         await prisma.$connect();
 

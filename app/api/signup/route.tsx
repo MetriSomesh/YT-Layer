@@ -12,17 +12,17 @@ export const POST = async (req: NextRequest) => {
   });
 
   if (existingUser) {
-    await prisma.invitation.deleteMany();
-    await prisma.youTuber.deleteMany();
+    // await prisma.invitation.deleteMany();
+    // await prisma.youTuber.deleteMany();
     await prisma.editor.deleteMany();
     // Now delete all records from the User table
-    await prisma.user.deleteMany();
-    return NextResponse.json(
-      {
-        msg: "Email is already registered",
-      },
-      { status: 400 }
-    );
+    // await prisma.user.deleteMany();
+    // return NextResponse.json(
+    //   {
+    //     msg: "Email is already registered",
+    //   },
+    //   { status: 400 }
+    // );
   }
 
   try {

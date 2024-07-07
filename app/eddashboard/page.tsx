@@ -25,14 +25,6 @@ export default function DashBoard() {
     if (res.status === 200) {
       setHasNewNotifications(true);
 
-      // const invitations = await axios.post(
-      //   "http://localhost:3000/api/getinvitation",
-      //   {
-      //     editorId: secondId,
-      //   }
-      // );
-
-      // console.log(invitations.data);
     }
   };
   useEffect(() => {
@@ -50,7 +42,7 @@ export default function DashBoard() {
         if (getEditorId.status === 200) {
           setEditorId(getEditorId.data.editor);
 
-          // console.log(editorId.data.editor);
+   
         }
       }
     };

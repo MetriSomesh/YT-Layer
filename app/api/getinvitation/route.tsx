@@ -13,7 +13,7 @@ export const POST = async (req: NextRequest) => {
 
   try {
     await prisma.$connect();
-    const Isinvitation = await prisma.editor.findMany({
+    const Isinvitation = await prisma.editor.findUnique({
       where: { id: editorId },
       include: {
         invitation: {
@@ -25,7 +25,7 @@ export const POST = async (req: NextRequest) => {
     });
 
     console.log(Isinvitation);
-    if (Isinvitation.length === 0) {
+    if (Isinvitation?.invitation.length === 0) {
       await prisma.$disconnect();
       return NextResponse.json(
         { msg: "Invitation not found" },

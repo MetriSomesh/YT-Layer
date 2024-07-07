@@ -2,11 +2,66 @@
 import { ChannelCard } from "@/components/ChannelCard";
 import { DashAppbar } from "@/components/DashAppbar";
 import { EditorCard } from "@/components/EditorCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
+import { newYtNotificationState } from "../state/newYtNotificationState";
+import axios from "axios";
+import { youtuberIdState } from "../state/youtuberIdState";
+import { getSession } from "next-auth/react";
+import { userIdState } from "../state/userState";
+import { ytnotificationState } from "../state/ytnotificationState";
 
 export default function DashBoard() {
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
+  const [newYtNotification, setNewYtNotification] = useRecoilState(
+    newYtNotificationState
+  );
+  const [youtuberId, setYoutuberId] = useRecoilState(youtuberIdState);
+  const [userId, setUserId] = useRecoilState(userIdState);
+  const [ytNotification, setYtNotification] =
+    useRecoilState(ytnotificationState);
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const session = await getSession();
+      if (session && session.user && session.user.id) {
+        setUserId(session.user.id);
+        const id = parseInt(session.user.id || "");
+        const getYoutuberId = await axios.post(
+          "http://localhost:3000/api/getYoutuberId",
+          {
+            id: id,
+          }
+        );
+        if (getYoutuberId.status === 200) {
+          setYoutuberId(getYoutuberId.data.youtuber);
+        }
+      }
+    };
+
+    fetchUserId();
+  }, []);
+  const checkNewNotification = async () => {
+    const res = await axios.post(
+      "http://localhost:3000/api/checkytnotification",
+      {
+        youtuberId: youtuberId,
+      }
+    );
+    if (res.status === 200) {
+      setNewYtNotification(true);
+      setYtNotification(res.data.notification);
+      console.log(res.data.notification);
+    }
+  };
+
+  useEffect(() => {
+    setInterval(async () => {
+      if (userId !== null) {
+        checkNewNotification();
+        console.log(userId);
+      }
+    }, 30000);
+    //10000f
+  }, [youtuberId]);
 
   return (
     <div className="h-screen bg-slate-200">

@@ -45,10 +45,13 @@ export const POST = async (req: NextRequest) => {
       );
     }
     await prisma.$disconnect();
-    return NextResponse.json({
-      msg: "Notification created successfully",
-      newNotification,
-    });
+    return NextResponse.json(
+      {
+        msg: "Notification created successfully",
+        newNotification,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     await prisma.$disconnect();
     console.error(error);

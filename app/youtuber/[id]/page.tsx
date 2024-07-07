@@ -1,9 +1,11 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useRecoilState } from "recoil";
 import { channelInfoState } from "../../../app/state/channelInfoState";
 import { Card } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
+import { currentInvitationState } from "@/app/state/currentInvitationState";
+import axios from "axios";
 
 interface User {
   id: number;
@@ -32,6 +34,72 @@ interface YoutuberDetailProps {
 
 const YoutuberDetailPage: React.FC<YoutuberDetailProps> = ({ youtuber }) => {
   const [channelInfo, setChannelInfo] = useRecoilState(channelInfoState);
+  const [currentInvitation, setCurrentInvitation] = useRecoilState(
+    currentInvitationState
+  );
+  const [loadingAccept, setLoadingAccept] = useState(false);
+  const [loadingReject, setLoadingReject] = useState(false);
+  const [actionCompleted, setActionCompleted] = useState<string | null>(null);
+
+  const handleAcceptClick = async (invitationId: number | null) => {
+    setLoadingAccept(true);
+    setLoadingReject(false);
+    try {
+       const ytNotification = await axios.post(
+        "http://localhost:3000/api/sendytnotification",
+        {
+          invitationId: invitationId,
+          status: "Accepted",
+        }
+      );
+      if (ytNotification.status == 200) {
+      const response = await axios.post(
+        "http://localhost:3000/api/acceptinvitation",
+        {
+          invitationId: invitationId,
+          status: "Accepted",
+        }
+      );
+      if (response.status === 200) {
+        setActionCompleted("accepted");
+      }
+    }
+    } catch (error) {
+      console.error("Error accepting invitation:", error);
+    } finally {
+      setLoadingAccept(false);
+    }
+  };
+
+  const handleRejectClick = async (invitationId: number | null) => {
+    setLoadingReject(true);
+    setLoadingAccept(false);
+    try {
+      const ytNotification = await axios.post(
+        "http://localhost:3000/api/sendytnotification",
+        {
+          invitationId: invitationId,
+          status: "Rejected",
+        }
+      );
+      if (ytNotification.status == 200) {
+        const response = await axios.post(
+          "http://localhost:3000/api/rejectinvitation",
+          {
+            invitationId: invitationId,
+            status: "Rejected",
+          }
+        );
+        if (response.status === 200) {
+          setActionCompleted("rejected");
+        }
+      }
+    } catch (error) {
+      console.error("Error rejecting invitation:", error);
+    } finally {
+      setLoadingReject(false);
+    }
+  };
 
   if (!channelInfo) {
     return <div>Youtuber not found</div>;
@@ -81,18 +149,76 @@ const YoutuberDetailPage: React.FC<YoutuberDetailProps> = ({ youtuber }) => {
           </div>
         </div>
         <div className="mt-10 flex justify-center space-x-4">
-          <Button
-            className="bg-green-500 hover:bg-green-600"
-            // onClick={() => handleActionClick("accept")}
-          >
-            Accept
-          </Button>
-          <Button
-            className="bg-red-500 hover:bg-red-600"
-            // onClick={() => handleActionClick("reject")}
-          >
-            Reject
-          </Button>
+          {actionCompleted ? (
+            <div className="text-xl text-green-400">
+              Invitation{" "}
+              {actionCompleted === "accepted" ? "accepted" : "rejected"}{" "}
+              successfully.
+            </div>
+          ) : (
+            <>
+              <Button
+                className="bg-green-500 hover:bg-green-600"
+                onClick={() => handleAcceptClick(currentInvitation)}
+                disabled={loadingReject || loadingAccept}
+              >
+                {loadingAccept ? (
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C6.477 0 2 4.477 2 10.5S6.477 21 12 21v-2a8 8 0 01-8-8z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Accept"
+                )}
+              </Button>
+              <Button
+                className="bg-red-500 hover:bg-red-600"
+                onClick={() => handleRejectClick(currentInvitation)}
+                disabled={loadingAccept || loadingReject}
+              >
+                {loadingReject ? (
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C6.477 0 2 4.477 2 10.5S6.477 21 12 21v-2a8 8 0 01-8-8z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Reject"
+                )}
+              </Button>
+            </>
+          )}
         </div>
         <div className="mt-4 flex justify-center">
           <a

@@ -1,0 +1,226 @@
+"use client";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import axios from "axios";
+import { youtuberIdState } from "../state/youtuberIdState";
+import { useRecoilState } from "recoil";
+import { ytIdState } from "../state/ytIdState";
+
+const VideoUploadPage: React.FC = () => {
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [title, setTitle] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
+  const [description, setDescription] = useState("");
+  const [tags, setTags] = useState("");
+  const [uploadThumbnail, setUploadThumbnail] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [buttonLoading, setButtonLoading] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [ytId, setYtId] = useRecoilState(ytIdState);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setVideoFile(e.target.files[0]);
+    }
+  };
+
+  const handleThumbnailChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (e.target.files && e.target.files[0]) {
+      console.log("UYOUTBOER J0", ytId);
+      const file = e.target.files[0];
+      setUploadThumbnail(file);
+
+      try {
+        const formData = new FormData();
+        formData.append("image", file);
+        const res = await fetch("api/picupload", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        setThumbnail(data.imageUrl.toString());
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        setError("Failed to upload thumbnail. Please try again.");
+      }
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!videoFile || !title || !description || !thumbnail || !tags) {
+      setError("Please fill out all required fields.");
+      return;
+    }
+
+    setButtonLoading(true);
+    const formData = new FormData();
+
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("tags", tags);
+    formData.append("videoUrl", videoUrl);
+    formData.append("thumbnailUrl", thumbnail);
+    formData.append("youtuberId", ytId !== null ? ytId.toString() : "");
+
+    const reader = new FileReader();
+    reader.readAsDataURL(videoFile);
+    reader.onloadend = async () => {
+      const base64data = reader.result;
+
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/api/vidupload",
+          {
+            fileStr: base64data,
+            title,
+            description,
+            tags,
+            thumbnailUrl: thumbnail,
+            youtuberId: ytId !== null ? ytId.toString() : "",
+          },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        if (response.status === 200) {
+          const newVideo = await axios.post(
+            "http://localhost:3000/api/createvideorecord",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
+        }
+        console.log("Success", response.data);
+        // Reset form or redirect user after successful upload
+      } catch (error) {
+        console.error("Error:", error);
+        setError("Failed to upload video. Please try again.");
+      } finally {
+        setButtonLoading(false);
+      }
+    };
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <h1 className="text-3xl font-bold mb-8">Upload Video</h1>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-6">
+        <div className="max-w-3xl mx-auto space-y-6">
+          {/* Video Upload */}
+          <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              />
+            </svg>
+            <p className="mt-2">Drag and drop video files to upload</p>
+            <p className="text-sm text-gray-400 mt-1">
+              Or click to select files
+            </p>
+            <Input
+              type="file"
+              accept="video/*"
+              className="hidden"
+              id="video-upload"
+              onChange={handleFileChange}
+              required
+            />
+            <Button
+              type="button"
+              className="mt-4"
+              onClick={() => document.getElementById("video-upload")?.click()}
+            >
+              Select Files
+            </Button>
+            {videoFile && <p className="mt-2">{videoFile.name}</p>}
+          </div>
+
+          {/* Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              placeholder="Enter video title"
+              className="bg-gray-800 border-gray-700"
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Enter video description"
+              className="bg-gray-800 border-gray-700 min-h-[100px]"
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Tags */}
+          <div className="space-y-2">
+            <Label htmlFor="tags">Tags</Label>
+            <Input
+              id="tags"
+              placeholder="Add tags (comma separated)"
+              className="bg-gray-800 border-gray-700"
+              onChange={(e) => setTags(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Thumbnail Upload */}
+          <div className="space-y-2">
+            <Label htmlFor="thumbnail">Thumbnail</Label>
+            <div className="border-2 border-dashed border-gray-600 rounded-lg p-4">
+              <Input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="thumbnail"
+                onChange={handleThumbnailChange}
+                required
+              />
+              <Button
+                type="button"
+                onClick={() => document.getElementById("thumbnail")?.click()}
+              >
+                Upload Thumbnail
+              </Button>
+              {thumbnail && <p className="mt-2">Thumbnail uploaded</p>}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <Button type="submit" className="w-full" disabled={buttonLoading}>
+            {buttonLoading ? "Uploading..." : "Upload Video"}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default VideoUploadPage;

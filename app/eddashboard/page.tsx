@@ -11,12 +11,15 @@ import { EDashAppbar } from "@/components/EDDashAppBar";
 import { notificationState } from "../state/notificationState";
 import { newnotificationState } from "../state/newnotificationState";
 import { editorIdState } from "../state/editorIdState";
+import { UploadVideoCard } from "@/components/UploadVideoCard";
+import { ytIdState } from "../state/ytIdState";
 
 export default function DashBoard() {
   const [hasNewNotifications, setHasNewNotifications] =
     useRecoilState(newnotificationState);
   const [userId, setUserId] = useRecoilState(userIdState);
   const [editorId, setEditorId] = useRecoilState(editorIdState);
+  const [ytId, setYtId] = useRecoilState(ytIdState);
 
   const checkNewInvitation = async () => {
     const res = await axios.post("http://localhost:3000/api/checkinvitation", {
@@ -24,7 +27,6 @@ export default function DashBoard() {
     });
     if (res.status === 200) {
       setHasNewNotifications(true);
-
     }
   };
   useEffect(() => {
@@ -41,14 +43,25 @@ export default function DashBoard() {
         );
         if (getEditorId.status === 200) {
           setEditorId(getEditorId.data.editor);
-
-   
         }
       }
     };
 
     fetchUserId();
   }, []);
+  useEffect(() => {
+    const fetchYoutuberId = async () => {
+      const ytId = await axios.post("http://localhost:3000/api/getytid", {
+        id: editorId,
+      });
+
+      if (ytId.data.youtuber) {
+        console.log(ytId.data.youtuber);
+        setYtId(ytId.data.youtuber);
+      }
+    };
+    fetchYoutuberId();
+  }, [editorId]);
 
   useEffect(() => {
     setInterval(async () => {
@@ -63,7 +76,10 @@ export default function DashBoard() {
   return (
     <div className="h-screen bg-slate-200">
       <EDashAppbar />
-      <div className="h-52">{userId}</div>
+      <div className="h-52"></div>
+      <div className="w-full  mt-5 flex h-56 gap-96 justify-evenly">
+        <UploadVideoCard />
+      </div>
     </div>
   );
 }

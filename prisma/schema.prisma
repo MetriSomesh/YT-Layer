@@ -63,7 +63,8 @@ model Video {
   id         Int    @id @default( autoincrement())
   title       String
   description String
-  status      String
+  thumbnail String?
+  status      String @default("pending")
   tags        String
   url         String
   youtuberId  Int? @unique

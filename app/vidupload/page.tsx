@@ -5,11 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
-import { youtuberIdState } from "../state/youtuberIdState";
 import { useRecoilState } from "recoil";
 import { ytIdState } from "../state/ytIdState";
 import { videoPublicIdState } from "../state/videoPublicIdState";
 import { editorIdState } from "../state/editorIdState";
+import { useRouter } from "next/navigation";
 
 const VideoUploadPage: React.FC = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -23,6 +23,7 @@ const VideoUploadPage: React.FC = () => {
   const [publicId, setPublicId] = useRecoilState(videoPublicIdState);
   const [ytId, setYtId] = useRecoilState(ytIdState);
   const [editorId, setEditorId] = useRecoilState(editorIdState);
+  const router = useRouter();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -64,14 +65,6 @@ const VideoUploadPage: React.FC = () => {
     }
 
     setButtonLoading(true);
-    // const formData = new FormData();
-
-    // formData.append("title", title);
-    // formData.append("description", description);
-    // formData.append("tags", tags);
-    // formData.append("publicId", publicId !== null ? publicId : "");
-    // formData.append("thumbnailUrl", thumbnail);
-    // formData.append("youtuberId", ytId !== null ? ytId.toString() : "");
 
     const reader = new FileReader();
     reader.readAsDataURL(videoFile);
@@ -90,9 +83,13 @@ const VideoUploadPage: React.FC = () => {
         );
         if (response.status === 200) {
           await setPublicId(response.data.data.public_id);
-          console.log("PUBLIC ID : ", response.data.data.public_id);
+          console.log("SUCURE URL IS  : ", response.data.data.secure_url);
           const videoData = {
             publicId: response.data.data.public_id,
+            format: response.data.data.format,
+            playbackUrl: response.data.data.playback_url,
+            secureUrl: response.data.data.secure_url,
+            duration: response.data.data.duration,
             title: title,
             description: description,
             tags: tags,
@@ -109,9 +106,14 @@ const VideoUploadPage: React.FC = () => {
               },
             }
           );
+          if (newVideo.status === 201) {
+            router.push(`/video/${response.data.data.public_id}`);
+            // const pubId = response.data.data.public_id;
+            // const res = await axios.post("/api/getvideodelivery", {
+            //   publicId: pubId,
+            // });
+          }
         }
-        console.log("Success", response.data);
-        // Reset form or redirect user after successful upload
       } catch (error) {
         console.error("Error:", error);
         setError("Failed to upload video. Please try again.");

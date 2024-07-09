@@ -67,6 +67,9 @@ model Video {
   status      String @default("pending")
   tags        String
   publicId    String
+  format      String
+  playbackUrl String
+  duration Float?
   youtuberId  Int? @unique
   youtuber    YouTuber? @relation(fields: [youtuberId],references: [id])
   editorId Int? @unique

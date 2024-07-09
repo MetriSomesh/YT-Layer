@@ -27,8 +27,17 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
       );
     }
 
-    const { title, description, tags, thumbnailUrl, youtuberId, editorId } =
-      formData;
+    const {
+      title,
+      description,
+      tags,
+      thumbnailUrl,
+      youtuberId,
+      editorId,
+      format,
+      playbackUrl,
+      duration,
+    } = formData;
 
     if (typeof youtuberId !== "number" || isNaN(youtuberId)) {
       return NextResponse.json({ msg: "Invalid youtuberId" }, { status: 400 });
@@ -43,6 +52,9 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         thumbnail: thumbnailUrl,
         youtuberId,
         editorId,
+        format,
+        playbackUrl,
+        duration,
       },
     });
 

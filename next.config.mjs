@@ -33,6 +33,8 @@ const nextConfig = {
       },
     ],
   },
+  // Add this line to transpile the cloudinary-react package
+  transpilePackages: ["cloudinary-react"],
 };
 
 export default nextConfig;

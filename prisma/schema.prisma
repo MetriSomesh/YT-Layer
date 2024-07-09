@@ -66,9 +66,11 @@ model Video {
   thumbnail String?
   status      String @default("pending")
   tags        String
-  url         String
+  publicId    String
   youtuberId  Int? @unique
   youtuber    YouTuber? @relation(fields: [youtuberId],references: [id])
+  editorId Int? @unique
+  editor Editor? @relation(fields: [editorId],references: [id])
 }
 
 model Editor {
@@ -86,6 +88,7 @@ model Editor {
   youtuber YouTuber? @relation(fields: [youtuberId],references: [id])
   invitation Invitation[]
   ytnotification YouTuberNotification?
+  video Video?
 }
 
 model Invitation{

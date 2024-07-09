@@ -8,6 +8,8 @@ import axios from "axios";
 import { youtuberIdState } from "../state/youtuberIdState";
 import { useRecoilState } from "recoil";
 import { ytIdState } from "../state/ytIdState";
+import { videoPublicIdState } from "../state/videoPublicIdState";
+import { editorIdState } from "../state/editorIdState";
 
 const VideoUploadPage: React.FC = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -18,8 +20,9 @@ const VideoUploadPage: React.FC = () => {
   const [uploadThumbnail, setUploadThumbnail] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const [videoUrl, setVideoUrl] = useState("");
+  const [publicId, setPublicId] = useRecoilState(videoPublicIdState);
   const [ytId, setYtId] = useRecoilState(ytIdState);
+  const [editorId, setEditorId] = useRecoilState(editorIdState);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -61,14 +64,14 @@ const VideoUploadPage: React.FC = () => {
     }
 
     setButtonLoading(true);
-    const formData = new FormData();
+    // const formData = new FormData();
 
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("tags", tags);
-    formData.append("videoUrl", videoUrl);
-    formData.append("thumbnailUrl", thumbnail);
-    formData.append("youtuberId", ytId !== null ? ytId.toString() : "");
+    // formData.append("title", title);
+    // formData.append("description", description);
+    // formData.append("tags", tags);
+    // formData.append("publicId", publicId !== null ? publicId : "");
+    // formData.append("thumbnailUrl", thumbnail);
+    // formData.append("youtuberId", ytId !== null ? ytId.toString() : "");
 
     const reader = new FileReader();
     reader.readAsDataURL(videoFile);
@@ -80,23 +83,29 @@ const VideoUploadPage: React.FC = () => {
           "http://localhost:3000/api/vidupload",
           {
             fileStr: base64data,
-            title,
-            description,
-            tags,
-            thumbnailUrl: thumbnail,
-            youtuberId: ytId !== null ? ytId.toString() : "",
           },
           {
             headers: { "Content-Type": "application/json" },
           }
         );
         if (response.status === 200) {
+          await setPublicId(response.data.data.public_id);
+          console.log("PUBLIC ID : ", response.data.data.public_id);
+          const videoData = {
+            publicId: response.data.data.public_id,
+            title: title,
+            description: description,
+            tags: tags,
+            thumbnailUrl: thumbnail,
+            youtuberId: ytId,
+            editorId: editorId,
+          };
           const newVideo = await axios.post(
             "http://localhost:3000/api/createvideorecord",
-            formData,
+            videoData,
             {
               headers: {
-                "Content-Type": "multipart/form-data",
+                "Content-Type": "application/json",
               },
             }
           );

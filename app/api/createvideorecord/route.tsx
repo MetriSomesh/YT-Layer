@@ -2,40 +2,47 @@ import { PrismaClient, UserType } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
-export const POST = async (req: NextRequest, res: NextResponse) => {
-  const formData = await req.formData();
 
+export const POST = async (req: NextRequest, res: NextResponse) => {
   try {
     await prisma.$connect();
+
+    const body = await req.json();
+    const { publicId, ...formData } = body;
+
     if (!formData) {
       await prisma.$disconnect();
       return NextResponse.json(
         {
-          msg: "Form data did not received",
+          msg: "Form data not received",
         },
         { status: 400 }
       );
     }
 
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const tags = formData.get("tags") as string;
-    const videoUrl = formData.get("videoUrl") as string;
-    const thumbnailUrl = formData.get("thumbnailUrl") as string;
-    const youtuberId = parseInt(formData.get("youtuberId") as string, 10);
+    if (!publicId) {
+      return NextResponse.json(
+        { msg: "Public ID is required" },
+        { status: 400 }
+      );
+    }
 
-    if (isNaN(youtuberId)) {
+    const { title, description, tags, thumbnailUrl, youtuberId, editorId } =
+      formData;
+
+    if (typeof youtuberId !== "number" || isNaN(youtuberId)) {
       return NextResponse.json({ msg: "Invalid youtuberId" }, { status: 400 });
     }
 
     const newVideo = await prisma.video.create({
       data: {
-        title: title,
-        description: description,
-        tags: tags,
-        url: videoUrl,
+        title,
+        description,
+        tags,
+        publicId,
         thumbnail: thumbnailUrl,
-        youtuberId: youtuberId,
+        youtuberId,
+        editorId,
       },
     });
 

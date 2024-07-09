@@ -42,6 +42,10 @@ export async function POST(request: NextRequest) {
         playbackUrl: result?.playbackUrl,
         duration: result?.duration,
         secure_url,
+        title:result?.title,
+        descrption:result?.description,
+        tags:result?.tags,
+        thumbnail:result?.thumbnail
       };
     }
 
@@ -51,6 +55,10 @@ export async function POST(request: NextRequest) {
       playbackUrl: result?.playbackUrl,
       duration: result?.duration,
       secure_url,
+      title: result?.title,
+      descrption: result?.description,
+      tags: result?.tags,
+      thumbnail: result?.thumbnail,
     };
 
     return NextResponse.json(videoDelivery);

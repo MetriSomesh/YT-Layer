@@ -1,4 +1,5 @@
 "use client";
+import { videoPublicIdState } from "@/app/state/videoPublicIdState";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,9 +10,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import { useRecoilState } from "recoil";
 
 export function UploadVideoCard() {
   const router = useRouter();
+  const [publicId, setPublicId] = useRecoilState(videoPublicIdState);
   return (
     <Card className="w-[400px] text-center">
       <CardHeader className="mt-2">
@@ -25,7 +28,11 @@ export function UploadVideoCard() {
         <Button
           className="mt-2 w-[90px]"
           onClick={() => {
-            router.push("/vidupload");
+            if (publicId !== null) {
+              router.push(`/video/${publicId}`);
+            } else {
+              router.push("/vidupload");
+            }
           }}
         >
           Upload

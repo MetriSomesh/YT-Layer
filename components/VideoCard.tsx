@@ -1,3 +1,4 @@
+import { videoPublicIdState } from "@/app/state/videoPublicIdState";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,8 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { useRecoilState } from "recoil";
 
 export function VideoCard() {
+  const router = useRouter();
+  const [publicId, setPublicId] = useRecoilState(videoPublicIdState);
   return (
     <Card className="w-[400px] text-center">
       <CardHeader className="mt-2">
@@ -19,7 +24,14 @@ export function VideoCard() {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center">
-        <Button className="mt-2 w-[90px]">View</Button>
+        <Button
+          className="mt-2 w-[90px]"
+          onClick={() => {
+            router.push(`/video/${publicId}`);
+          }}
+        >
+          View
+        </Button>
       </CardContent>
     </Card>
   );

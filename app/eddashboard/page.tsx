@@ -13,6 +13,7 @@ import { newnotificationState } from "../state/newnotificationState";
 import { editorIdState } from "../state/editorIdState";
 import { UploadVideoCard } from "@/components/UploadVideoCard";
 import { ytIdState } from "../state/ytIdState";
+import { videoPublicIdState } from "../state/videoPublicIdState";
 
 export default function DashBoard() {
   const [hasNewNotifications, setHasNewNotifications] =
@@ -20,6 +21,7 @@ export default function DashBoard() {
   const [userId, setUserId] = useRecoilState(userIdState);
   const [editorId, setEditorId] = useRecoilState(editorIdState);
   const [ytId, setYtId] = useRecoilState(ytIdState);
+  const [publicId, setPublicId] = useRecoilState(videoPublicIdState);
 
   const checkNewInvitation = async () => {
     const res = await axios.post("http://localhost:3000/api/checkinvitation", {
@@ -43,6 +45,15 @@ export default function DashBoard() {
         );
         if (getEditorId.status === 200) {
           setEditorId(getEditorId.data.editor);
+          const pubId = await axios.post(
+            "http://localhost:3000/api/getPublicId",
+            {
+              editorId: getEditorId.data.editor,
+            }
+          );
+          if (pubId.status === 200) {
+            setPublicId(pubId.data.publicId);
+          }
         }
       }
     };

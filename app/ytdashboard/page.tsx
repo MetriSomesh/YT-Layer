@@ -12,6 +12,7 @@ import { userIdState } from "../state/userState";
 import { ytnotificationState } from "../state/ytnotificationState";
 import { VideoCard } from "@/components/VideoCard";
 import { assignedEditorInfoState } from "../state/assignedEditorInfoState";
+import { videoPublicIdState } from "../state/videoPublicIdState";
 
 export default function DashBoard() {
   const [newYtNotification, setNewYtNotification] = useRecoilState(
@@ -22,76 +23,94 @@ export default function DashBoard() {
   const [ytNotification, setYtNotification] =
     useRecoilState(ytnotificationState);
   const [editorInfo, setEditorInfo] = useRecoilState(assignedEditorInfoState);
+  const [publicId, setPublicId] = useRecoilState(videoPublicIdState);
+
   useEffect(() => {
-    const fetchUserId = async () => {
-      const session = await getSession();
-      if (session && session.user && session.user.id) {
-        setUserId(session.user.id);
-        const id = parseInt(session.user.id || "");
-        const getYoutuberId = await axios.post(
-          "http://localhost:3000/api/getYoutuberId",
-          {
-            id: id,
+    const fetchData = async () => {
+      try {
+        const session = await getSession();
+        if (session && session.user && session.user.id) {
+          setUserId(session.user.id);
+          const id = parseInt(session.user.id || "");
+
+          const getYoutuberId = await axios.post(
+            "http://localhost:3000/api/getYoutuberId",
+            { id }
+          );
+          if (getYoutuberId.status === 200) {
+            setYoutuberId(getYoutuberId.data.youtuber);
+
+            const pubId = await axios.post(
+              "http://localhost:3000/api/getPublicId",
+              { youtuberId: getYoutuberId.data.youtuber }
+            );
+            if (pubId.status === 200) {
+              setPublicId(pubId.data.publicId);
+            }
           }
-        );
-        if (getYoutuberId.status === 200) {
-          setYoutuberId(getYoutuberId.data.youtuber);
         }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchUserId();
+    fetchData();
   }, []);
 
   useEffect(() => {
     const fetchEditor = async () => {
-      const editorInfo = await axios.post(
-        "http://localhost:3000/api/isEditorAssigned",
-        {
-          id: youtuberId,
+      try {
+        const editorInfo = await axios.post(
+          "http://localhost:3000/api/isEditorAssigned",
+          { id: youtuberId }
+        );
+        if (editorInfo.data.editor) {
+          setEditorInfo(editorInfo.data.editor);
+          console.log(editorInfo.data.editor);
         }
-      );
-
-      if (editorInfo.data.editor) {
-        setEditorInfo(editorInfo.data.editor);
-        console.log(editorInfo.data.editor);
+      } catch (error) {
+        console.error("Error fetching editor info:", error);
       }
     };
 
-    fetchEditor();
+    if (youtuberId) {
+      fetchEditor();
+    }
   }, [youtuberId]);
 
   const checkNewNotification = async () => {
-    const res = await axios.post(
-      "http://localhost:3000/api/checkytnotification",
-      {
-        youtuberId: youtuberId,
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/api/checkytnotification",
+        { youtuberId }
+      );
+      if (res.status === 200) {
+        setNewYtNotification(true);
+        setYtNotification(res.data.notification);
+        console.log(res.data.notification);
       }
-    );
-    if (res.status === 200) {
-      setNewYtNotification(true);
-      setYtNotification(res.data.notification);
-      console.log(res.data.notification);
+    } catch (error) {
+      console.error("Error checking new notification:", error);
     }
   };
 
   useEffect(() => {
-    setInterval(async () => {
+    const intervalId = setInterval(async () => {
       if (userId !== null) {
-        checkNewNotification();
+        await checkNewNotification();
         console.log(userId);
       }
     }, 30000);
-    //10000f
-  }, [youtuberId]);
+
+    return () => clearInterval(intervalId);
+  }, [userId, youtuberId]);
 
   return (
     <div className="h-screen bg-slate-200">
       <DashAppbar />
       <div className="h-52"></div>
-      <div className="w-full  mt-5 flex h-56 gap-96 justify-evenly">
+      <div className="w-full mt-5 flex h-56 gap-96 justify-evenly">
         {editorInfo?.youtuberId === youtuberId ? <VideoCard /> : <EditorCard />}
-
         <ChannelCard />
       </div>
     </div>

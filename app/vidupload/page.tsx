@@ -107,7 +107,9 @@ const VideoUploadPage: React.FC = () => {
             }
           );
           if (newVideo.status === 201) {
-            router.push(`/video/${response.data.data.public_id}`);
+            router.push(
+              `/video/${response.data.data.public_id}?isYoutuber=false`
+            );
             // const pubId = response.data.data.public_id;
             // const res = await axios.post("/api/getvideodelivery", {
             //   publicId: pubId,

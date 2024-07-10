@@ -6,6 +6,7 @@ import OAUTH2Data from "../../../credentials.json";
 const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
+  await prisma.$connect();
   const CLIENT_ID = OAUTH2Data.web.client_id;
   const CLIENT_SECRET = OAUTH2Data.web.client_secret;
   const REDIRECT_URL = OAUTH2Data.web.redirect_uris[0];
@@ -21,6 +22,7 @@ export const POST = async (req: NextRequest) => {
     const { youtuberId } = body;
 
     if (!youtuberId) {
+      await prisma.$disconnect();
       return NextResponse.json({ msg: "Youtuber Id not found", status: 400 });
     }
 
@@ -33,6 +35,7 @@ export const POST = async (req: NextRequest) => {
     });
 
     if (!youtuber) {
+     await prisma.$disconnect();
       return NextResponse.json({
         msg: "Youtuber record not found",
         status: 400,
@@ -43,6 +46,7 @@ export const POST = async (req: NextRequest) => {
     });
 
     if (existingChannel) {
+      await prisma.$disconnect();
       return NextResponse.json({
         msg: "Channel already exists for this YouTuber",
         status: 400,
@@ -63,6 +67,7 @@ export const POST = async (req: NextRequest) => {
     const channelInfo = channelResponse.data.items?.[0];
 
     if (!channelInfo) {
+      await prisma.$disconnect();
       return NextResponse.json({
         msg: "Unable to get channelInfo from the YouTube API",
         status: 401,
@@ -86,12 +91,13 @@ export const POST = async (req: NextRequest) => {
     });
 
     if (!channels) {
+      await prisma.$disconnect();
       return NextResponse.json({
         msg: "Unable to create channel record",
         status: 400,
       });
     }
-
+    await prisma.$disconnect();
     return NextResponse.json({ channel: channels });
   } catch (error) {
     console.error(error);

@@ -16,7 +16,7 @@ export const POST = async (req: NextRequest) => {
 
     if (status === "Accepted") {
       try {
-        await prisma.$connect();
+      
 
         const invitation = await prisma.invitation.findUnique({
           where: { id: invitationId },

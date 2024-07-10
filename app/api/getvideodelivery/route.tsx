@@ -60,9 +60,10 @@ export async function POST(request: NextRequest) {
       tags: result?.tags,
       thumbnail: result?.thumbnail,
     };
-
+    await prisma.$disconnect();
     return NextResponse.json(videoDelivery);
   } catch (error) {
+    await prisma.$disconnect();
     console.error("Error fetching video delivery:", error);
     return NextResponse.json(
       { error: "Failed to fetch video delivery information" },

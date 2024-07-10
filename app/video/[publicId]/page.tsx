@@ -2,7 +2,16 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { FaThumbsUp, FaThumbsDown, FaShare, FaDownload } from "react-icons/fa";
+import {
+  FaThumbsUp,
+  FaThumbsDown,
+  FaShare,
+  FaDownload,
+  FaYoutube,
+  FaTrash,
+} from "react-icons/fa";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface VideoDelivery {
   publicId: string;
@@ -11,11 +20,10 @@ interface VideoDelivery {
   playbackUrl: string;
   duration: number;
   title: string;
-  description: string;
+  descrption: string;
   tags: string;
   thumbnail: string;
 }
-
 const fetchVideoDelivery = async (publicId: string): Promise<VideoDelivery> => {
   try {
     const response = await axios.post("/api/getvideodelivery", { publicId });
@@ -26,12 +34,63 @@ const fetchVideoDelivery = async (publicId: string): Promise<VideoDelivery> => {
   }
 };
 
-const VideoPlayerPage = ({ params }: { params: { publicId: string } }) => {
+const VideoPlayerPage = ({
+  params,
+  searchParams,
+}: {
+  params: { publicId: string };
+  searchParams: { isYoutuber: string };
+}) => {
   const [videoDelivery, setVideoDelivery] = useState<VideoDelivery | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isYoutuber = searchParams.isYoutuber === "true";
+
+  const router = useRouter();
+  const handleUploadToYoutube = async () => {
+    if (!videoDelivery) return;
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/viduploadtoyt",
+        {
+          youtuberId: 13, // This should be dynamically set based on the actual YouTuber ID
+          videoDetails: {
+            title: videoDelivery.title,
+            description: videoDelivery.descrption,
+            //  tags: videoDelivery.tags.split(",").map((tag) => tag.trim()),
+            // categoryId: "22", // You might want to add this to your VideoDelivery interface
+            //  privacyStatus: "private", // Or get this from user input
+          },
+          videoUrl: videoDelivery.secure_url,
+        }
+      );
+
+      if (response.data.success) {
+        console.log(
+          "Video uploaded successfully. Video ID:",
+          response.data.videoId
+        );
+      } else {
+        throw new Error(response.data.error || "Failed to upload video");
+      }
+    } catch (error) {
+      console.error("Error uploading video:", error);
+    }
+  };
+  const handleDiscardVideo = async () => {
+    try {
+      const deleteVideo = await axios.post("/api/viddelete", {
+        publicId: videoDelivery?.publicId,
+      });
+      console.log(deleteVideo.data.msg);
+      router.push("/ytdashboard");
+    } catch (error) {
+      console.error("Erro occured: ", error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,23 +152,28 @@ const VideoPlayerPage = ({ params }: { params: { publicId: string } }) => {
                 {(videoDelivery.duration % 60).toString().padStart(2, "0")} |{" "}
                 {videoDelivery.format.toUpperCase()}
               </div>
-              {/* <div className="flex space-x-4">
-                <button className="flex items-center space-x-1 hover:text-blue-500">
-                  <FaThumbsUp /> <span>Like</span>
-                </button>
-                <button className="flex items-center space-x-1 hover:text-blue-500">
-                  <FaThumbsDown /> <span>Dislike</span>
-                </button>
-                <button className="flex items-center space-x-1 hover:text-blue-500">
-                  <FaShare /> <span>Share</span>
-                </button>
-                <button className="flex items-center space-x-1 hover:text-blue-500">
-                  <FaDownload /> <span>Download</span>
-                </button>
-              </div> */}
+              {isYoutuber && (
+                <div className="flex space-x-4">
+                  <Button
+                    className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleUploadToYoutube}
+                  >
+                    <FaYoutube />
+                    <span>Upload to YouTube</span>
+                  </Button>
+
+                  <Button
+                    className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleDiscardVideo}
+                  >
+                    <FaTrash />
+                    <span>Discard Video</span>
+                  </Button>
+                </div>
+              )}
             </div>
             <div className="bg-gray-800 rounded-lg p-4 mb-4">
-              <p className="text-sm mb-2">{videoDelivery.description}</p>
+              <p className="text-sm mb-2">{videoDelivery.descrption}</p>
               <div className="flex flex-wrap gap-2">
                 {videoDelivery.tags.split(",").map((tag, index) => (
                   <span

@@ -66,7 +66,7 @@ model Video {
   thumbnail String?
   status      String @default("pending")
   tags        String
-  publicId    String
+  publicId    String @unique
   format      String
   playbackUrl String
   duration Float?

@@ -1,6 +1,5 @@
 "use client";
 
-import { PrismaClient, UserType } from "@prisma/client";
 import axios from "axios";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -11,7 +10,7 @@ export default function Signin() {
   const [password, setPassword] = useState("");
   let userType = "YOUTUBER";
   const router = useRouter();
-  const prisma = new PrismaClient();
+  
 
   return (
     <div className="h-screen flex justify-center flex-col">

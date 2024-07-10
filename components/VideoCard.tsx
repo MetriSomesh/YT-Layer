@@ -27,7 +27,7 @@ export function VideoCard() {
         <Button
           className="mt-2 w-[90px]"
           onClick={() => {
-            router.push(`/video/${publicId}`);
+            router.push(`/video/${publicId}?isYoutuber=true`);
           }}
         >
           View

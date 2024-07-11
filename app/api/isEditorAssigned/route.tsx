@@ -24,6 +24,10 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
       return NextResponse.json({ msg: "Editor not assigned" }, { status: 404 });
     }
 
+    if (youtuberInfo?.editor == null) {
+      await prisma.$disconnect();
+      return NextResponse.json({ msg: "Editor not assigned" }, { status: 404 });
+    }
     await prisma.$disconnect();
     return NextResponse.json({
       msg: "Editor is assigned",

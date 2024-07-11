@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import {
-  FaThumbsUp,
-  FaThumbsDown,
-  FaShare,
-  FaDownload,
-  FaYoutube,
-  FaTrash,
-} from "react-icons/fa";
+import { FaYoutube, FaTrash } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
@@ -47,47 +40,51 @@ const VideoPlayerPage = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const isYoutuber = searchParams.isYoutuber === "true";
-
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const handleUploadToYoutube = async () => {
     if (!videoDelivery) return;
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/viduploadtoyt",
-        {
-          youtuberId: 13, // This should be dynamically set based on the actual YouTuber ID
-          videoDetails: {
-            title: videoDelivery.title,
-            description: videoDelivery.descrption,
-            //  tags: videoDelivery.tags.split(",").map((tag) => tag.trim()),
-            // categoryId: "22", // You might want to add this to your VideoDelivery interface
-            //  privacyStatus: "private", // Or get this from user input
-          },
-          videoUrl: videoDelivery.secure_url,
-        }
-      );
+      setLoading(true);
+      const response = await axios.post("/api/viduploadtoyt", {
+        youtuberId: 13, // This should be dynamically set based on the actual YouTuber ID
+        videoDetails: {
+          title: videoDelivery.title,
+          description: videoDelivery.descrption,
+          tags: videoDelivery.tags.split(",").map((tag) => tag.trim()),
+          // categoryId: "22", // You might want to add this to your VideoDelivery interface
+          //  privacyStatus: "private", // Or get this from user input
+        },
+        videoUrl: videoDelivery.secure_url,
+      });
 
       if (response.data.success) {
+        setLoading(false);
         console.log(
           "Video uploaded successfully. Video ID:",
           response.data.videoId
         );
       } else {
+        setLoading(false);
         throw new Error(response.data.error || "Failed to upload video");
       }
     } catch (error) {
+      setLoading(false);
       console.error("Error uploading video:", error);
     }
   };
   const handleDiscardVideo = async () => {
+    setLoading(true);
     try {
       const deleteVideo = await axios.post("/api/viddelete", {
         publicId: videoDelivery?.publicId,
       });
+      setLoading(false);
       console.log(deleteVideo.data.msg);
       router.push("/ytdashboard");
     } catch (error) {
+      setLoading(false);
       console.error("Erro occured: ", error);
     }
   };
@@ -157,17 +154,47 @@ const VideoPlayerPage = ({
                   <Button
                     className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     onClick={handleUploadToYoutube}
+                    disabled={loading}
                   >
-                    <FaYoutube />
-                    <span>Upload to YouTube</span>
+                    {loading ? (
+                      <>
+                        <div className="absolute inset-0 flex items-center justify-center bg-red-700">
+                          <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                        <span className="opacity-0">
+                          <FaYoutube />
+                          <span>Upload to YouTube</span>
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <FaYoutube />
+                        <span>Upload to YouTube</span>
+                      </>
+                    )}
                   </Button>
 
                   <Button
                     className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                     onClick={handleDiscardVideo}
+                    disabled={loading}
                   >
-                    <FaTrash />
-                    <span>Discard Video</span>
+                    {loading ? (
+                      <>
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
+                          <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                        <span className="opacity-0">
+                          <FaTrash />
+                          <span>Discard Video</span>
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <FaTrash />
+                        <span>Discard Video</span>
+                      </>
+                    )}
                   </Button>
                 </div>
               )}

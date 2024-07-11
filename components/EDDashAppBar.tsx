@@ -56,16 +56,13 @@ export const EDashAppbar = () => {
   //   fetchUserId();
   // }, []);
 
-
   useEffect(() => {
     const fetchAllInvitations = async () => {
+      setLoading(true); // Start loading
       try {
-        const response = await axios.post(
-          "http://localhost:3000/api/getinvitation",
-          {
-            editorId: editorId,
-          }
-        );
+        const response = await axios.post("/api/getinvitation", {
+          editorId: editorId,
+        });
 
         if (response.status === 200) {
           console.log("Fetched invitations:", response.data.invitation);
@@ -73,6 +70,8 @@ export const EDashAppbar = () => {
         }
       } catch (error) {
         console.error("Error fetching invitations:", error);
+      } finally {
+        setLoading(false); // End loading
       }
     };
     if (editorId) {
@@ -82,20 +81,14 @@ export const EDashAppbar = () => {
 
   const handleViewClick = async (invitationId: number) => {
     setCurrentInvitation(invitationId);
-    const markInvitation = await axios.post(
-      "http://localhost:3000/api/invimarkasread",
-      {
-        invitationId: invitationId,
-      }
-    );
+    const markInvitation = await axios.post("/api/invimarkasread", {
+      invitationId: invitationId,
+    });
 
     if (markInvitation.status !== 200) {
-      const markInvitation = await axios.post(
-        "http://localhost:3000/api/invimarkasread",
-        {
-          invitationId: invitationId,
-        }
-      );
+      const markInvitation = await axios.post("/api/invimarkasread", {
+        invitationId: invitationId,
+      });
       if (markInvitation.status === 200) {
         console.log("marked invitation as read in second attempt");
       }
@@ -106,14 +99,11 @@ export const EDashAppbar = () => {
 
   const hasNewNotification = async () => {
     if (hasNewNotifications) {
-      setLoading(true);
+      setLoading(true); // Start loading
       try {
-        const response = await axios.post(
-          "http://localhost:3000/api/getinvitation",
-          {
-            editorId: editorId,
-          }
-        );
+        const response = await axios.post("/api/getinvitation", {
+          editorId: editorId,
+        });
         if (response.status === 200) {
           setAllInvitations((prevInvitations) => {
             if (!prevInvitations) return response.data.invitation.invitation;
@@ -123,7 +113,7 @@ export const EDashAppbar = () => {
       } catch (error) {
         console.error("Failed to fetch invitations:", error);
       } finally {
-        setLoading(false);
+        setLoading(false); // End loading
         setHasNewNotifications(false);
       }
     }
@@ -140,88 +130,131 @@ export const EDashAppbar = () => {
   };
 
   return (
-    <nav className="border-gray-200 bg-gray-900 h-20 mx-auto flex items-center justify-between w-full">
-      <div className="md:max-w-screen-2xl mx-auto flex items-center justify-between w-full">
-        <div className="text-white text-lg">YT-Layer</div>
-        <div className="items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse flex gap-5">
-          <DropdownMenu onOpenChange={hasNewNotification}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="relative">
-                <Image src={notificationIcon} alt="Notifications" />
-
-                {hasNewNotifications && (
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-72">
-              <DropdownMenuLabel>Invitations</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {loading ? (
-                <Spinner />
-              ) : (
-                <DropdownMenuGroup>
-                  {allInvitations && allInvitations.length > 0 ? (
-                    allInvitations.map((inv, index) => (
-                      <DropdownMenuItem
-                        className={`gap-4 ${
-                          inv.viewed ? "text-gray-500" : "font-bold text-white"
-                        }`}
-                        key={index}
-                        onClick={() => {}}
-                      >
-                        <Avatar>
-                          <AvatarImage
-                            src={inv.channel.ChannelPic || undefined}
-                          />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col">
-                          <span>{inv.message}</span>
-                        </div>
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setChannelInfo(inv.channel);
-                            console.log(inv.channel);
-                            if (!inv.viewed) {
-                              handleViewClick(inv.id || 0);
-                            }
-                            if (inv.channel.channelId) {
-                              setCurrentInvitation(inv.id);
-                              navigateToYoutuberDetail(inv.channel.channelId);
-                            }
-                          }}
-                          className="ml-auto"
-                        >
-                          View
-                        </Button>
-                      </DropdownMenuItem>
-                    ))
-                  ) : (
-                    <DropdownMenuItem>No invitations</DropdownMenuItem>
+    <nav className="bg-gray-900 shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          <div className="flex-shrink-0">
+            <span className="text-white text-2xl font-bold">YT-Layer</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <DropdownMenu onOpenChange={hasNewNotification}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative text-gray-300 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-white"
+                >
+                  <Image
+                    src={notificationIcon}
+                    alt="Notifications"
+                    className="w-6 h-6"
+                  />
+                  {hasNewNotifications && (
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-gray-900 bg-red-500"></span>
                   )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-80 mt-2 bg-gray-800 rounded-md shadow-lg border border-gray-700">
+                <DropdownMenuLabel className="px-4 py-2 text-lg font-semibold text-gray-200">
+                  Invitations
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-gray-700" />
+                {loading ? (
+                  <div className="flex justify-center items-center p-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-300"></div>
+                  </div>
+                ) : (
+                  <DropdownMenuGroup>
+                    {allInvitations && allInvitations.length > 0 ? (
+                      allInvitations.map((inv, index) => (
+                        <DropdownMenuItem
+                          className={`p-4 hover:bg-gray-700 ${
+                            inv.viewed
+                              ? "text-gray-400"
+                              : "font-semibold text-gray-200"
+                          }`}
+                          key={index}
+                          onClick={() => {}}
+                        >
+                          <div className="flex items-center space-x-3 w-full">
+                            <Avatar>
+                              <AvatarImage
+                                src={inv.channel.ChannelPic || undefined}
+                                alt="Channel"
+                              />
+                              <AvatarFallback className="bg-gray-600 text-white">
+                                CN
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1">
+                              <p className="text-sm">{inv.message}</p>
+                            </div>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setChannelInfo(inv.channel);
+                                console.log(inv.channel);
+                                if (!inv.viewed) {
+                                  handleViewClick(inv.id || 0);
+                                }
+                                if (inv.channel.channelId) {
+                                  setCurrentInvitation(inv.id);
+                                  navigateToYoutuberDetail(
+                                    inv.channel.channelId
+                                  );
+                                }
+                              }}
+                              className="ml-auto bg-gray-700 hover:bg-gray-600 text-white font-semibold py-1 px-3 rounded-full transition-colors duration-300"
+                            >
+                              View
+                            </Button>
+                          </div>
+                        </DropdownMenuItem>
+                      ))
+                    ) : (
+                      <DropdownMenuItem className="p-4 text-gray-400">
+                        No invitations
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuGroup>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-white"
+                >
+                  <Avatar>
+                    <AvatarImage src={profile} alt="Profile" />
+                    <AvatarFallback className="bg-gray-600 text-white">
+                      ED
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 mt-2 bg-gray-800 rounded-md shadow-lg border border-gray-700">
+                <DropdownMenuLabel className="px-4 py-2 text-lg font-semibold text-gray-200">
+                  Profile
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-gray-700" />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-gray-300">
+                    Edit Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-gray-300"
+                    onClick={handleSignOut}
+                  >
+                    Logout
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="relative">
-                <Image src={profile} alt="profile" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Profile</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>Edit Profile</DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSignOut}>
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
     </nav>

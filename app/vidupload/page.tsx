@@ -73,7 +73,7 @@ const VideoUploadPage: React.FC = () => {
 
       try {
         const response = await axios.post(
-          "http://localhost:3000/api/vidupload",
+          "/api/vidupload",
           {
             fileStr: base64data,
           },
@@ -98,7 +98,7 @@ const VideoUploadPage: React.FC = () => {
             editorId: editorId,
           };
           const newVideo = await axios.post(
-            "http://localhost:3000/api/createvideorecord",
+            "/api/createvideorecord",
             videoData,
             {
               headers: {
@@ -167,6 +167,27 @@ const VideoUploadPage: React.FC = () => {
             </Button>
             {videoFile && <p className="mt-2">{videoFile.name}</p>}
           </div>
+          {/* Thumbnail Upload */}
+          <div className="space-y-2">
+            <Label htmlFor="thumbnail">Thumbnail</Label>
+            <div className="border-2 border-dashed border-gray-600 rounded-lg p-4">
+              <Input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="thumbnail"
+                onChange={handleThumbnailChange}
+                required
+              />
+              <Button
+                type="button"
+                onClick={() => document.getElementById("thumbnail")?.click()}
+              >
+                Upload Thumbnail
+              </Button>
+              {thumbnail && <p className="mt-2">Thumbnail uploaded</p>}
+            </div>
+          </div>
 
           {/* Title */}
           <div className="space-y-2">
@@ -202,28 +223,6 @@ const VideoUploadPage: React.FC = () => {
               onChange={(e) => setTags(e.target.value)}
               required
             />
-          </div>
-
-          {/* Thumbnail Upload */}
-          <div className="space-y-2">
-            <Label htmlFor="thumbnail">Thumbnail</Label>
-            <div className="border-2 border-dashed border-gray-600 rounded-lg p-4">
-              <Input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                id="thumbnail"
-                onChange={handleThumbnailChange}
-                required
-              />
-              <Button
-                type="button"
-                onClick={() => document.getElementById("thumbnail")?.click()}
-              >
-                Upload Thumbnail
-              </Button>
-              {thumbnail && <p className="mt-2">Thumbnail uploaded</p>}
-            </div>
           </div>
 
           {/* Submit Button */}

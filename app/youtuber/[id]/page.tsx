@@ -46,7 +46,7 @@ const YoutuberDetailPage: React.FC<YoutuberDetailProps> = ({ youtuber }) => {
     setLoadingReject(false);
     try {
        const ytNotification = await axios.post(
-        "http://localhost:3000/api/sendytnotification",
+        "/api/sendytnotification",
         {
           invitationId: invitationId,
           status: "Accepted",
@@ -54,7 +54,7 @@ const YoutuberDetailPage: React.FC<YoutuberDetailProps> = ({ youtuber }) => {
       );
       if (ytNotification.status == 200) {
       const response = await axios.post(
-        "http://localhost:3000/api/acceptinvitation",
+        "/api/acceptinvitation",
         {
           invitationId: invitationId,
           status: "Accepted",
@@ -76,7 +76,7 @@ const YoutuberDetailPage: React.FC<YoutuberDetailProps> = ({ youtuber }) => {
     setLoadingAccept(false);
     try {
       const ytNotification = await axios.post(
-        "http://localhost:3000/api/sendytnotification",
+        "/api/sendytnotification",
         {
           invitationId: invitationId,
           status: "Rejected",
@@ -84,7 +84,7 @@ const YoutuberDetailPage: React.FC<YoutuberDetailProps> = ({ youtuber }) => {
       );
       if (ytNotification.status == 200) {
         const response = await axios.post(
-          "http://localhost:3000/api/rejectinvitation",
+          "/api/rejectinvitation",
           {
             invitationId: invitationId,
             status: "Rejected",

@@ -12,6 +12,7 @@ export default function AuthComp({ type }: { type: string }) {
   const [userEmail, setUserEmail] = useRecoilState(userEmailState);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const userType =
     typeof localStorage !== "undefined" &&
     localStorage.getItem("userType") === "YOUTUBER"
@@ -24,90 +25,88 @@ export default function AuthComp({ type }: { type: string }) {
       "Content-type": "application/json",
     },
   };
-  return (
-    <div className="h-screen flex justify-center flex-col">
-      <div className="flex justify-center">
-        <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 ">
-          <div>
-            <div className="px-10">
-              <div className="text-3xl font-extrabold">
-                {" "}
-                {type === "signup" ? "Sign Up" : "Sign In"}
-              </div>
-            </div>
-            <div className="pt-2">
-              <LabelledInput
-                onChange={(e) => {
-                  setUsername(e.target.value);
-                }}
-                label="Username"
-                placeholder="John Doe"
-              />
-              {type === "signup" ? (
-                <LabelledInput
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                  }}
-                  label="Email"
-                  placeholder="jhondoe@gmail.com"
-                />
-              ) : null}
-              <LabelledInput
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
-                label="Password"
-                type={"password"}
-                placeholder="password"
-              />
-              <button
-                onClick={async () => {
-                  const res = await axios.post(
-                    "http://localhost:3000/api/signup",
-                    {
-                      username,
-                      email,
-                      password,
-                      userType,
-                    }
-                  );
-                  setUserEmail(email);
-                  if (res.status === 201) {
-                    if (userType === UserType.YOUTUBER) {
-                      localStorage.setItem("userEmail", email);
-                      //push to anoter route
-                      const res = axios.get(
-                        "http://localhost:3000/api/googleauth"
-                      );
-                      const url = (await res).data.authUrl;
-                      router.push(url);
-                    } else {
-                      localStorage.setItem("userEmail", email);
-                      localStorage.setItem("userId", res.data.user.id);
-                      router.push("/account");
-                    }
-                  }
-                }}
-                type="button"
-                className="mt-8 w-full text-white bg-gray-800 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-              >
-                {type === "signup" ? "Continue" : "Sign In"}
-              </button>
 
-              <div className="text-xs mt-2">
-                {type === "signup"
-                  ? "Already have an account?"
-                  : "Don't have an account? "}
-                <a
-                  href={type === "signup" ? "/signin" : "/signup"}
-                  className="underline text-[#3430ff]"
-                >
-                  {" "}
-                  {type === "signup" ? "Signin" : "Signup"}
-                </a>
-              </div>
-            </div>
-          </div>
+  return (
+    <div className="min-h-screen bg-gray-900 flex justify-center items-center px-4">
+      <div className="w-full max-w-md">
+        <div className="bg-gray-800 shadow-lg rounded-lg p-8">
+          <h2 className="text-3xl font-extrabold text-white text-center mb-6">
+            {type === "signup" ? "Sign Up" : "Sign In"}
+          </h2>
+          <form>
+            <LabelledInput
+              onChange={(e) => setUsername(e.target.value)}
+              label="Username"
+              placeholder="John Doe"
+            />
+            {type === "signup" && (
+              <LabelledInput
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setUserEmail(e.target.value);
+                }}
+                label="Email"
+                placeholder="johndoe@gmail.com"
+              />
+            )}
+            <LabelledInput
+              onChange={(e) => setPassword(e.target.value)}
+              label="Password"
+              type="password"
+              placeholder="••••••••"
+            />
+            <button
+              onClick={async () => {
+                setLoading(true);
+                const res = await axios.post("/api/signup", {
+                  username,
+                  email,
+                  password,
+                  userType,
+                });
+                setUserEmail(email);
+                if (res.status === 201) {
+                  if (userType === UserType.YOUTUBER) {
+                    localStorage.setItem("userEmail", email);
+                    const res = axios.get("/api/googleauth");
+                    const url = (await res).data.authUrl;
+                    router.push(url);
+                  } else {
+                    localStorage.setItem("userEmail", email);
+                    localStorage.setItem("userId", res.data.user.id);
+                    router.push("/account");
+                  }
+                }
+              }}
+              type="button"
+              className="w-full text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-6 transition-colors duration-300"
+            >
+              {" "}
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center bg-purple-700">
+                    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                  <span className="opacity-0">Sign In</span>
+                </div>
+              ) : type === "signup" ? (
+                "Continue"
+              ) : (
+                "Sign Up"
+              )}
+            </button>
+          </form>
+          <p className="text-sm text-gray-400 mt-4 text-center">
+            {type === "signup"
+              ? "Already have an account?"
+              : "Don't have an account?"}{" "}
+            <a
+              href={type === "signup" ? "/signin" : "/signup"}
+              className="text-purple-400 hover:text-purple-300 underline"
+            >
+              {type === "signup" ? "Sign In" : "Sign Up"}
+            </a>
+          </p>
         </div>
       </div>
     </div>
@@ -128,14 +127,13 @@ function LabelledInput({
   onChange,
 }: LabelledInputType) {
   return (
-    <div>
-      <label className="block mb-2 text-sm text-black font-semibold pt-4 text-start">
+    <div className="mb-4">
+      <label className="block mb-2 text-sm font-medium text-gray-300">
         {label}
       </label>
       <input
         type={type || "text"}
-        id="first_name"
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        className="w-full px-3 py-2 text-sm text-white bg-gray-700 border border-gray-600 rounded-lg focus:ring-purple-500 focus:border-purple-500"
         placeholder={placeholder}
         required
         onChange={onChange}

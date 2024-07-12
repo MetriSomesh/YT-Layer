@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { userIdState } from "../app/state/userState";
 import { getSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -30,7 +30,7 @@ export const DashAppbar = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [userId, setUserId] = useRecoilState(userIdState);
-  const [youtuberId, setYoutuberId] = useRecoilState(youtuberIdState);
+  const youtuberId = useRecoilValue(youtuberIdState);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [newYtNotification, setNewYtNotification] = useRecoilState(
@@ -62,12 +62,12 @@ export const DashAppbar = () => {
 
   useEffect(() => {
     const createChannel = async () => {
-      const newChannel = await axios.post(
-        "/api/channelinfo",
-        {
-          youtuberId: youtuberId,
-        }
-      );
+      if (youtuberId !== null) {
+        return;
+      }
+      const newChannel = await axios.post("/api/channelinfo", {
+        youtuberId: youtuberId,
+      });
 
       if (newChannel) {
         console.log(newChannel);
@@ -75,14 +75,15 @@ export const DashAppbar = () => {
     };
     createChannel();
   }, [youtuberId]);
+
   useEffect(() => {
+    if (profilePic !== null) {
+      return;
+    }
     const getProfile = async () => {
-      const profilePic = await axios.post(
-        "/api/getYtProfilePic",
-        {
-          id: youtuberId,
-        }
-      );
+      const profilePic = await axios.post("/api/getYtProfilePic", {
+        id: youtuberId,
+      });
 
       if (profilePic.status === 200) {
         setProfilePic(profilePic.data.channelPic);
@@ -106,12 +107,9 @@ export const DashAppbar = () => {
   };
 
   const handleOkButton = async (notificationId: number | null) => {
-    const deleteNotification = await axios.post(
-      "/api/deleteytnotification",
-      {
-        notificationId: notificationId,
-      }
-    );
+    const deleteNotification = await axios.post("/api/deleteytnotification", {
+      notificationId: notificationId,
+    });
     if (deleteNotification.status === 200) {
       console.log("notification deleted");
     }

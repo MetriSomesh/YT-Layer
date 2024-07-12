@@ -35,12 +35,12 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
   const [isInvitationSent, setIsInvitationSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [statusCode, setStatusCode] = useState(false);
-  const [youtuberId,setYoutuberId] = useRecoilState(youtuberIdState);
+  // const youtuberId = useRecoilValue(youtuberIdState);
+  const youtuberId = parseInt(localStorage.getItem("youtuberId") || "");
 
   const handleInviteClick = async () => {
     setLoading(true);
     try {
-
       const channelInfo = await axios.post("/api/getChannelInfo", {
         id: youtuberId,
       });
@@ -95,6 +95,7 @@ const EditorDetail: React.FC<EditorDetailProps> = ({ editor }) => {
               ></path>
             </svg>
             Back to Search
+            {youtuberId}
           </Link>
         </div>
         <div className="relative px-6 py-10 sm:px-10">

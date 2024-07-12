@@ -38,17 +38,21 @@ const VideoPlayerPage = ({
     null
   );
   const [isLoading, setIsLoading] = useState(true);
+  const youtuerId = localStorage.getItem("youtuberId");
   const [error, setError] = useState<string | null>(null);
   const isYoutuber = searchParams.isYoutuber === "true";
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [discardLoading, setDiscardLoading] = useState(false);
+
   const handleUploadToYoutube = async () => {
     if (!videoDelivery) return;
 
     try {
-      setLoading(true);
+      setUploadLoading(true);
       const response = await axios.post("/api/viduploadtoyt", {
-        youtuberId: 13, // This should be dynamically set based on the actual YouTuber ID
+        youtuberId: parseInt(youtuerId || ""), // This should be dynamically set based on the actual YouTuber ID
         videoDetails: {
           title: videoDelivery.title,
           description: videoDelivery.descrption,
@@ -60,31 +64,31 @@ const VideoPlayerPage = ({
       });
 
       if (response.data.success) {
-        setLoading(false);
+        setUploadLoading(false);
         console.log(
           "Video uploaded successfully. Video ID:",
           response.data.videoId
         );
       } else {
-        setLoading(false);
+        setUploadLoading(false);
         throw new Error(response.data.error || "Failed to upload video");
       }
     } catch (error) {
-      setLoading(false);
+      setUploadLoading(false);
       console.error("Error uploading video:", error);
     }
   };
   const handleDiscardVideo = async () => {
-    setLoading(true);
+    setDiscardLoading(true);
     try {
       const deleteVideo = await axios.post("/api/viddelete", {
         publicId: videoDelivery?.publicId,
       });
-      setLoading(false);
+      setDiscardLoading(false);
       console.log(deleteVideo.data.msg);
       router.push("/ytdashboard");
     } catch (error) {
-      setLoading(false);
+      setDiscardLoading(false);
       console.error("Erro occured: ", error);
     }
   };
@@ -154,47 +158,27 @@ const VideoPlayerPage = ({
                   <Button
                     className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     onClick={handleUploadToYoutube}
-                    disabled={loading}
+                    disabled={uploadLoading || discardLoading}
                   >
-                    {loading ? (
-                      <>
-                        <div className="absolute inset-0 flex items-center justify-center bg-red-700">
-                          <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                        <span className="opacity-0">
-                          <FaYoutube />
-                          <span>Upload to YouTube</span>
-                        </span>
-                      </>
+                    {uploadLoading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     ) : (
-                      <>
-                        <FaYoutube />
-                        <span>Upload to YouTube</span>
-                      </>
+                      <FaYoutube className="mr-2" />
                     )}
+                    <span>Upload to YouTube</span>
                   </Button>
 
                   <Button
                     className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                     onClick={handleDiscardVideo}
-                    disabled={loading}
+                    disabled={uploadLoading || discardLoading}
                   >
-                    {loading ? (
-                      <>
-                        <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
-                          <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                        <span className="opacity-0">
-                          <FaTrash />
-                          <span>Discard Video</span>
-                        </span>
-                      </>
+                    {discardLoading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     ) : (
-                      <>
-                        <FaTrash />
-                        <span>Discard Video</span>
-                      </>
+                      <FaTrash className="mr-2" />
                     )}
+                    <span>Discard Video</span>
                   </Button>
                 </div>
               )}

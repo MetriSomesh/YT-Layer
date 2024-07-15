@@ -13,7 +13,6 @@ import { ytnotificationState } from "../state/ytnotificationState";
 import { VideoCard } from "@/components/VideoCard";
 import { assignedEditorInfoState } from "../state/assignedEditorInfoState";
 import { videoPublicIdState } from "../state/videoPublicIdState";
-import { motion } from "framer-motion";
 
 export default function DashBoard() {
   const [newYtNotification, setNewYtNotification] = useRecoilState(
@@ -51,7 +50,6 @@ export default function DashBoard() {
             }
           }
         }
-      
       } catch (error) {
         setLoading(false);
         console.error("Error fetching data:", error);

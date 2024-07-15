@@ -5,6 +5,7 @@ import axios from "axios";
 import { FaYoutube, FaTrash } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 interface VideoDelivery {
   publicId: string;
@@ -43,6 +44,7 @@ const VideoPlayerPage = ({
   const isYoutuber = searchParams.isYoutuber === "true";
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
   const [uploadLoading, setUploadLoading] = useState(false);
   const [discardLoading, setDiscardLoading] = useState(false);
 
@@ -52,7 +54,7 @@ const VideoPlayerPage = ({
     try {
       setUploadLoading(true);
       const response = await axios.post("/api/viduploadtoyt", {
-        youtuberId: parseInt(youtuerId || ""), // This should be dynamically set based on the actual YouTuber ID
+        youtuberId: parseInt(youtuerId || ""),
         videoDetails: {
           title: videoDelivery.title,
           description: videoDelivery.descrption,
@@ -64,17 +66,65 @@ const VideoPlayerPage = ({
       });
 
       if (response.data.success) {
-        setUploadLoading(false);
-        console.log(
-          "Video uploaded successfully. Video ID:",
-          response.data.videoId
-        );
+        try {
+          const deleteVideo = await axios.post("/api/viddelete", {
+            publicId: videoDelivery?.publicId,
+          });
+          if (deleteVideo.data.success) {
+            setUploadLoading(false);
+            console.log(
+              "Video uploaded successfully. Video ID:",
+              response.data.videoId
+            );
+            toast({
+              title: "Success!",
+              description: "Video uploaded successfully to YouTube.",
+              duration: 5000,
+              variant: "default",
+            });
+
+            router.push("/ytdashboard");
+          } else {
+            const deleteVideo = await axios.post("/api/viddelete", {
+              publicId: videoDelivery?.publicId,
+            });
+            setUploadLoading(false);
+            console.log(
+              "Video uploaded successfully. Video ID:",
+              response.data.videoId
+            );
+            toast({
+              title: "Success!",
+              description: "Video uploaded successfully to YouTube.",
+              duration: 5000,
+              variant: "default",
+            });
+
+            router.push("/ytdashboard");
+          }
+        } catch (error) {
+          setUploadLoading(false);
+          console.error(error);
+        }
       } else {
         setUploadLoading(false);
+        toast({
+          title: "Error",
+          description: "Something went wrong please try again.",
+          duration: 5000,
+          variant: "destructive",
+        });
+
         throw new Error(response.data.error || "Failed to upload video");
       }
     } catch (error) {
       setUploadLoading(false);
+      toast({
+        title: "Error",
+        description: "Something went wrong please try again.",
+        duration: 5000,
+        variant: "destructive",
+      });
       console.error("Error uploading video:", error);
     }
   };
@@ -89,6 +139,12 @@ const VideoPlayerPage = ({
       router.push("/ytdashboard");
     } catch (error) {
       setDiscardLoading(false);
+      toast({
+        title: "Error",
+        description: "Something went wrong please try again.",
+        duration: 5000,
+        variant: "destructive",
+      });
       console.error("Erro occured: ", error);
     }
   };
@@ -102,7 +158,7 @@ const VideoPlayerPage = ({
         setVideoDelivery(data);
       } catch (error) {
         console.error("Error fetching video delivery:", error);
-        setError("Failed to load video. Please try again later.");
+        setError("There are no video available");
       } finally {
         setIsLoading(false);
       }

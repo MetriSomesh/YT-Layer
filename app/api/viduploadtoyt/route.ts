@@ -72,6 +72,7 @@ export const POST = async (req: NextRequest) => {
         snippet: {
           title: videoDetails.title,
           description: videoDetails.description,
+          tags:videoDetails.tags,
         },
         status: {
           privacyStatus: "public",

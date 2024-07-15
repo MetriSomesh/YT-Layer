@@ -8,7 +8,7 @@ import { useState } from "react";
 export default function Signin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  let userType = "YOUTUBER";
+  let userType = null;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -36,26 +36,35 @@ export default function Signin() {
               onClick={async () => {
                 await setLoading(true);
                 userType = await axios.post("/api/getUserType", { email });
-
-                if (userType === "YOUTUBER") {
-                  const login = await signIn("credentials", {
-                    email,
-                    password,
-                    callbackUrl: "/ytdashboard",
-                    redirect: false,
-                  });
-                  if (login?.ok) {
-                    router.push(login.url || "");
-                  }
+                console.log(userType.data.userType);
+                if (!userType) {
+                  setLoading(false);
+                  return;
                 } else {
-                  const login = await signIn("credentials", {
-                    email,
-                    password,
-                    callbackUrl: "/eddashboard",
-                    redirect: false,
-                  });
-                  if (login?.ok) {
-                    router.push(login.url || "");
+                  if (userType.data.userType === "YOUTUBER") {
+                    const login = await signIn("credentials", {
+                      email,
+                      password,
+                      callbackUrl: "/ytdashboard",
+                      redirect: false,
+                    });
+                    if (login?.ok) {
+                      router.push(login.url || "");
+                    }
+                  } else if (userType.data.userType === "EDITOR") {
+                    const login = await signIn("credentials", {
+                      email,
+                      password,
+                      callbackUrl: "/eddashboard",
+                      redirect: false,
+                    });
+                    if (login?.ok) {
+                      router.push(login.url || "");
+                    }
+                    setLoading(false);
+                  } else {
+                    setLoading(false);
+                    return;
                   }
                 }
               }}

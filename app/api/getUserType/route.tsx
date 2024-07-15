@@ -29,7 +29,7 @@ export const POST = async (req: NextRequest) => {
 
     return NextResponse.json({
       msg: "User found",
-      userType: userTarget.userType,
+      userType: userTarget.userType.toString(),
     });
   } catch (error) {
     await prisma.$disconnect();
@@ -39,4 +39,3 @@ export const POST = async (req: NextRequest) => {
     });
   }
 };
-

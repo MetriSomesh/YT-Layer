@@ -13,7 +13,7 @@ export const POST = async (req: NextRequest) => {
 
   if (existingUser) {
     // await prisma.invitation.deleteMany();
-    // await prisma.youTuber.deleteMany();
+    await prisma.youTuber.deleteMany();
     await prisma.editor.deleteMany();
     // Now delete all records from the User table
     await prisma.user.deleteMany();

@@ -20,7 +20,8 @@ export default function DashBoard() {
   const [editorId, setEditorId] = useRecoilState(editorIdState);
   const [ytId, setYtId] = useRecoilState(ytIdState);
   const [publicId, setPublicId] = useRecoilState(videoPublicIdState);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  let edi: any;
 
   const checkNewInvitation = async () => {
     const res = await axios.post("http://localhost:3000/api/checkinvitation", {
@@ -42,6 +43,8 @@ export default function DashBoard() {
         });
         if (getEditorId.status === 200) {
           setEditorId(getEditorId.data.editor);
+          edi = getEditorId.data.editor;
+          fetchYoutuberId(edi);
           const pubId = await axios.post("/api/getPublicId", {
             editorId: getEditorId.data.editor,
           });
@@ -54,21 +57,24 @@ export default function DashBoard() {
 
     fetchUserId();
   }, []);
-  useEffect(() => {
-    const fetchYoutuberId = async () => {
+
+
+  const fetchYoutuberId = async (editorId: any) => {
+    try {
       const ytId = await axios.post("/api/getytid", {
         id: editorId,
       });
 
-      if (ytId.data.youtuber) {
-        setLoading(false);
+      if (ytId.status === 200 && ytId.data.youtuber) {
         console.log(ytId.data.youtuber);
         setYtId(ytId.data.youtuber);
       }
-    };
-    fetchYoutuberId();
-    setLoading(false);
-  }, [editorId]);
+    } catch (error) {
+      console.error("Error fetching YouTuber ID:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     setInterval(async () => {

@@ -39,31 +39,26 @@ const YoutuberDetailPage: React.FC<YoutuberDetailProps> = ({ youtuber }) => {
   );
   const [loadingAccept, setLoadingAccept] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
+  const yt = youtuber;
   const [actionCompleted, setActionCompleted] = useState<string | null>(null);
 
   const handleAcceptClick = async (invitationId: number | null) => {
     setLoadingAccept(true);
     setLoadingReject(false);
     try {
-       const ytNotification = await axios.post(
-        "/api/sendytnotification",
-        {
-          invitationId: invitationId,
-          status: "Accepted",
-        }
-      );
+      const ytNotification = await axios.post("/api/sendytnotification", {
+        invitationId: invitationId,
+        status: "Accepted",
+      });
       if (ytNotification.status == 200) {
-      const response = await axios.post(
-        "/api/acceptinvitation",
-        {
+        const response = await axios.post("/api/acceptinvitation", {
           invitationId: invitationId,
           status: "Accepted",
+        });
+        if (response.status === 200) {
+          setActionCompleted("accepted");
         }
-      );
-      if (response.status === 200) {
-        setActionCompleted("accepted");
       }
-    }
     } catch (error) {
       console.error("Error accepting invitation:", error);
     } finally {
@@ -75,21 +70,15 @@ const YoutuberDetailPage: React.FC<YoutuberDetailProps> = ({ youtuber }) => {
     setLoadingReject(true);
     setLoadingAccept(false);
     try {
-      const ytNotification = await axios.post(
-        "/api/sendytnotification",
-        {
+      const ytNotification = await axios.post("/api/sendytnotification", {
+        invitationId: invitationId,
+        status: "Rejected",
+      });
+      if (ytNotification.status == 200) {
+        const response = await axios.post("/api/rejectinvitation", {
           invitationId: invitationId,
           status: "Rejected",
-        }
-      );
-      if (ytNotification.status == 200) {
-        const response = await axios.post(
-          "/api/rejectinvitation",
-          {
-            invitationId: invitationId,
-            status: "Rejected",
-          }
-        );
+        });
         if (response.status === 200) {
           setActionCompleted("rejected");
         }

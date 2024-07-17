@@ -35,7 +35,7 @@ const VideoUploadPage: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (e.target.files && e.target.files[0]) {
-      console.log("UYOUTBOER J0", ytId);
+      console.log("YOUTBOER ", ytId);
       const file = e.target.files[0];
       setUploadThumbnail(file);
 

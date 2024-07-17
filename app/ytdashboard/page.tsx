@@ -40,6 +40,7 @@ export default function DashBoard() {
           );
           if (getYoutuberId.status === 200) {
             setYoutuberId(getYoutuberId.data.youtuber);
+            localStorage.setItem("youtuberId", getYoutuberId.data.youtuber);
 
             const pubId = await axios.post(
               "http://localhost:3000/api/getPublicId",
@@ -69,11 +70,11 @@ export default function DashBoard() {
         if (editorInfo.data.editor) {
           setEditorInfo(editorInfo.data.editor);
           console.log(editorInfo.data.editor);
-          setLoading(false);
         }
       } catch (error) {
-        setLoading(false);
         console.error("Error fetching editor info:", error);
+      } finally {
+        setLoading(false);
       }
     };
 

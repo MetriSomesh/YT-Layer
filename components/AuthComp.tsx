@@ -58,17 +58,22 @@ export default function AuthComp({ type }: { type: string }) {
             <button
               onClick={async () => {
                 setLoading(true);
-                const res = await axios.post("/api/signup", {
-                  username,
-                  email,
-                  password,
-                  userType,
-                });
+                const res = await axios.post(
+                  "https://yt-layer-rho.vercel.app/api/signup",
+                  {
+                    username,
+                    email,
+                    password,
+                    userType,
+                  }
+                );
                 setUserEmail(email);
                 if (res.status === 201) {
                   if (userType === UserType.YOUTUBER) {
                     localStorage.setItem("userEmail", email);
-                    const res = axios.get("/api/googleauth");
+                    const res = axios.get(
+                      "https://yt-layer-rho.vercel.app/api/googleauth"
+                    );
                     const url = (await res).data.authUrl;
                     router.push(url);
                   } else {

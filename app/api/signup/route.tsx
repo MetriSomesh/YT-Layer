@@ -50,7 +50,7 @@ export const POST = async (req: NextRequest) => {
     console.error(error);
     return NextResponse.json(
       {
-        error: "Internal Server Error",
+        error: error,
       },
       { status: 500 }
     );

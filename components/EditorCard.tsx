@@ -28,7 +28,7 @@ export const EditorCard = () => {
          <Button
            className="mt-2 w-[120px] bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-300"
            onClick={() => {
-             window.location.href = "http://localhost:3000/addeditor";
+             window.location.href = "/addeditor";
            }}
          >
            Add Editor

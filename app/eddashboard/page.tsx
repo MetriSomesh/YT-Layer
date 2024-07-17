@@ -24,7 +24,7 @@ export default function DashBoard() {
   let edi: any;
 
   const checkNewInvitation = async () => {
-    const res = await axios.post("http://localhost:3000/api/checkinvitation", {
+    const res = await axios.post("/api/checkinvitation", {
       editorId: editorId,
     });
     if (res.status === 200) {

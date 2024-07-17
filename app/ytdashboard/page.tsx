@@ -35,7 +35,7 @@ export default function DashBoard() {
           const id = parseInt(session.user.id || "");
 
           const getYoutuberId = await axios.post(
-            "http://localhost:3000/api/getYoutuberId",
+            "/api/getYoutuberId",
             { id }
           );
           if (getYoutuberId.status === 200) {
@@ -43,7 +43,7 @@ export default function DashBoard() {
             localStorage.setItem("youtuberId", getYoutuberId.data.youtuber);
 
             const pubId = await axios.post(
-              "http://localhost:3000/api/getPublicId",
+              "/api/getPublicId",
               { youtuberId: getYoutuberId.data.youtuber }
             );
             if (pubId.status === 200) {
@@ -64,7 +64,7 @@ export default function DashBoard() {
     const fetchEditor = async () => {
       try {
         const editorInfo = await axios.post(
-          "http://localhost:3000/api/isEditorAssigned",
+          "/api/isEditorAssigned",
           { id: youtuberId }
         );
         if (editorInfo.data.editor) {
@@ -86,7 +86,7 @@ export default function DashBoard() {
   const checkNewNotification = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/checkytnotification",
+        "/checkytnotification",
         { youtuberId }
       );
       if (res.status === 200) {

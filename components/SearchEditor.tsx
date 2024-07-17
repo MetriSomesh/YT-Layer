@@ -33,7 +33,7 @@ export const SearchEditors = () => {
   const handleKeyPress = async (e: any) => {
     if (e.keyCode === 13) {
       setLoading(true);
-      var res = await axios.post("http://localhost:3000/api/searcheditor", {
+      var res = await axios.post("/api/searcheditor", {
         searchTerm,
       });
 

@@ -125,7 +125,7 @@ export const GET = async (req: NextRequest) => {
       }
     }
     await prisma.$disconnect();
-    return NextResponse.redirect("http://localhost:3000/signin");
+    return NextResponse.redirect("/signin");
   } catch (error) {
     await prisma.$disconnect();
     console.error(

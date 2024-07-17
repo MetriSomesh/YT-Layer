@@ -16,7 +16,7 @@ export const POST = async (req: NextRequest) => {
     // await prisma.youTuber.deleteMany();
     await prisma.editor.deleteMany();
     // Now delete all records from the User table
-    // await prisma.user.deleteMany();
+    await prisma.user.deleteMany();
     // return NextResponse.json(
     //   {
     //     msg: "Email is already registered",

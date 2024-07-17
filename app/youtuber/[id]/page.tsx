@@ -32,14 +32,13 @@ interface YoutuberDetailProps {
   youtuber: Youtuber;
 }
 
-const YoutuberDetailPage: React.FC<YoutuberDetailProps> = ({ youtuber }) => {
+const YoutuberDetailPage = () => {
   const [channelInfo, setChannelInfo] = useRecoilState(channelInfoState);
   const [currentInvitation, setCurrentInvitation] = useRecoilState(
     currentInvitationState
   );
   const [loadingAccept, setLoadingAccept] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
-  const yt = youtuber;
   const [actionCompleted, setActionCompleted] = useState<string | null>(null);
 
   const handleAcceptClick = async (invitationId: number | null) => {

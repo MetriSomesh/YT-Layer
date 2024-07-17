@@ -12,14 +12,14 @@ export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   // Set the max content length to 500MB
-  const contentLength = parseInt(req.headers.get("content-length") || "0", 10);
-  if (contentLength > 500 * 1024 * 1024) {
-    // 500MB in bytes
-    return NextResponse.json(
-      { error: "File size exceeds 500MB limit" },
-      { status: 413 }
-    );
-  }
+  // const contentLength = parseInt(req.headers.get("content-length") || "0", 10);
+  // if (contentLength > 500 * 1024 * 1024) {
+  //   // 500MB in bytes
+  //   return NextResponse.json(
+  //     { error: "File size exceeds 500MB limit" },
+  //     { status: 413 }
+  //   );
+  // }
 
   try {
     const body = await req.json();

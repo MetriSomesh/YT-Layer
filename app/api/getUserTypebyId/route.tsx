@@ -1,0 +1,41 @@
+import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
+
+const prisma = new PrismaClient();
+
+export const POST = async (req: NextRequest) => {
+  const body = await req.json();
+  const { id } = body;
+
+  if (!id) {
+    return NextResponse.json({ msg: "Invalid parameters" });
+  }
+
+  try {
+    await prisma.$connect();
+    const userTarget = await prisma.user.findUnique({
+      where: { id: id },
+    });
+
+    if (!userTarget) {
+      prisma.$disconnect();
+      return NextResponse.json({
+        msg: "User not found ",
+        status: 404,
+      });
+    }
+
+    await prisma.$disconnect();
+
+    return NextResponse.json({
+      msg: "User found",
+      userType: userTarget.userType.toString(),
+    });
+  } catch (error) {
+    await prisma.$disconnect();
+    console.error(error);
+    return NextResponse.json({
+      error: error,
+    });
+  }
+};

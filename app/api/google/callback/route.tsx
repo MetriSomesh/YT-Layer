@@ -125,7 +125,7 @@ export const GET = async (req: NextRequest) => {
       }
     }
     await prisma.$disconnect();
-    return NextResponse.redirect("/signin");
+    return NextResponse.redirect("https://yt-layer-rho.vercel.app/signin");
   } catch (error) {
     await prisma.$disconnect();
     console.error(

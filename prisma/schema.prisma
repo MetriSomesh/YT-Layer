@@ -1,17 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-provider = "postgresql"
-     url  = "postgres://avnadmin:AVNS_3_vRjPKdiVDNmnRToSR@pg-3b91e495-someshmetri44-a564.d.aivencloud.com:20061/defaultdb?sslmode=require"
-
+  provider = "postgresql"
+  url      = "postgresql://neondb_owner:p5JwVEOQ6UPD@ep-falling-heart-a1znpd74-pooler.ap-southeast-1.aws.neon.tech/prisma_migrate_shadow_db_48099697-d65a-48e7-9cdf-473d150ee4e0?sslmode=require"
 }
 
 enum UserType {
@@ -19,24 +12,23 @@ enum UserType {
   EDITOR
 }
 
-model User{
-  id         Int    @id @default( autoincrement())
+model User {
+  id       Int       @id @default(autoincrement())
   username String
-  email String @unique
+  email    String    @unique
   password String
-  token String @default("") 
+  token    String    @default("")
   userType UserType
   youtuber YouTuber?
-  editor Editor?
+  editor   Editor?
 }
 
-
 model YouTuber {
-  id           Int       @id @default(autoincrement())
-  userId       Int       @unique
-  user         User      @relation(fields: [userId], references: [id])
-  accessToken  String    @default("")
-  refreshToken String    @default("")
+  id           Int                   @id @default(autoincrement())
+  userId       Int                   @unique
+  user         User                  @relation(fields: [userId], references: [id])
+  accessToken  String                @default("")
+  refreshToken String                @default("")
   video        Video?
   editor       Editor?
   invitation   Invitation?
@@ -45,75 +37,74 @@ model YouTuber {
 }
 
 model Channel {
-  id               Int       @id @default(autoincrement())
-  youtuberId       Int       @unique
-  youtuber         YouTuber  @relation(fields: [youtuberId], references: [id])
-  channelId        String
-  title            String
-  ChannelPic       String
-  description      String?
-  viewCount        String
-  subscriberCount  String
-  hiddenSubsCount  Boolean?
-  videoCount       String?
-  invitation Invitation?
+  id              Int         @id @default(autoincrement())
+  youtuberId      Int         @unique
+  youtuber        YouTuber    @relation(fields: [youtuberId], references: [id])
+  channelId       String
+  title           String
+  ChannelPic      String
+  description     String?
+  viewCount       String
+  subscriberCount String
+  hiddenSubsCount Boolean?
+  videoCount      String?
+  invitation      Invitation?
 }
 
-
 model Video {
-  id         Int    @id @default( autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String
-  thumbnail String?
-  status      String @default("pending")
+  thumbnail   String?
+  status      String    @default("pending")
   tags        String
-  publicId    String @unique
+  publicId    String    @unique
   format      String
   playbackUrl String
-  duration Float?
-  youtuberId  Int? @unique
-  youtuber    YouTuber? @relation(fields: [youtuberId],references: [id])
-  editorId Int? @unique
-  editor Editor? @relation(fields: [editorId],references: [id])
+  duration    Float?
+  youtuberId  Int?      @unique
+  youtuber    YouTuber? @relation(fields: [youtuberId], references: [id])
+  editorId    Int?      @unique
+  editor      Editor?   @relation(fields: [editorId], references: [id])
 }
 
 model Editor {
-  id         Int    @id @default( autoincrement())
-  userId    Int?     @unique
-  user      User?    @relation(fields: [userId], references: [id])
-  profile_pic String @unique
-  description String
-  experience String
-  phone_number String
-  country String
-  state String
-  city String
-  youtuberId Int? @unique
-  youtuber YouTuber? @relation(fields: [youtuberId],references: [id])
-  invitation Invitation[]
+  id             Int                   @id @default(autoincrement())
+  userId         Int?                  @unique
+  user           User?                 @relation(fields: [userId], references: [id])
+  profile_pic    String                @unique
+  description    String
+  experience     String
+  phone_number   String
+  country        String
+  state          String
+  city           String
+  youtuberId     Int?                  @unique
+  youtuber       YouTuber?             @relation(fields: [youtuberId], references: [id])
+  invitation     Invitation[]
   ytnotification YouTuberNotification?
-  video Video?
+  video          Video?
 }
 
-model Invitation{
-  id         Int    @id @default( autoincrement())
-  youtuberId Int? @unique
-  youtuber YouTuber? @relation(fields: [youtuberId],references: [id])
-  editorId Int? @unique
-  editor Editor? @relation(fields: [editorId],references: [id])
- channelId   Int?    @unique
-  channel     Channel? @relation(fields: [channelId], references: [id])
-  message String
-  status String?
-  viewed Boolean @default(false)
+model Invitation {
+  id         Int       @id @default(autoincrement())
+  youtuberId Int?      @unique
+  youtuber   YouTuber? @relation(fields: [youtuberId], references: [id])
+  editorId   Int?      @unique
+  editor     Editor?   @relation(fields: [editorId], references: [id])
+  channelId  Int?      @unique
+  channel    Channel?  @relation(fields: [channelId], references: [id])
+  message    String
+  status     String?
+  viewed     Boolean   @default(false)
 }
 
-model YouTuberNotification{
-  id Int @id @default(autoincrement())
-  youtuberId Int? @unique
-  youtuber YouTuber? @relation(fields: [youtuberId],references: [id])
-  editorId Int? @unique
-  editor Editor? @relation(fields: [editorId],references: [id])
-  status String?
-  viewed Boolean @default(false)
+model YouTuberNotification {
+  id         Int       @id @default(autoincrement())
+  youtuberId Int?      @unique
+  youtuber   YouTuber? @relation(fields: [youtuberId], references: [id])
+  editorId   Int?      @unique
+  editor     Editor?   @relation(fields: [editorId], references: [id])
+  status     String?
+  viewed     Boolean   @default(false)
 }

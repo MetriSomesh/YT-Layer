@@ -87,43 +87,74 @@ export default function DashBoard() {
   }, [editorId]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="min-h-screen bg-background text-foreground">
       {loading ? (
         <motion.div
-          className="flex flex-col items-center justify-center h-screen"
+          className="flex h-screen flex-col items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
           <motion.div
-            className="text-4xl font-bold text-purple-500 mb-8"
+            className="font-label text-2xl font-bold tracking-[0.3em]"
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            YT-Layer
+            YT<span className="text-primary">/</span>LAYER
           </motion.div>
           <motion.div
-            className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full"
+            className="mt-8 h-12 w-12 animate-spin rounded-full border-2 border-primary border-t-transparent"
             animate={{ rotate: 360 }}
             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
           />
           <motion.div
-            className="mt-4 text-xl text-gray-300"
+            className="font-label mt-6 text-xs tracking-[0.3em] text-muted-foreground"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
-            Loading...
+            LOADING YOUR WORKSPACE
           </motion.div>
         </motion.div>
       ) : (
         <>
           <EDashAppbar />
-          <div className="h-52"></div>
-          <div className="w-full mt-5 flex h-56 gap-96 justify-evenly">
-            <UploadVideoCard />
-          </div>
+          <main className="mx-auto max-w-6xl px-6 pb-20 pt-14">
+            <p className="font-label text-xs tracking-[0.3em] text-muted-foreground">
+              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-primary align-middle" />
+              EDITOR DASHBOARD
+            </p>
+            <h1 className="font-display mt-4 text-4xl font-bold tracking-tight md:text-5xl">
+              Your <span className="text-primary">cutting room</span>.
+            </h1>
+            <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
+              Upload the finished cut, and it goes to your YouTuber for review.
+            </p>
+
+            <div className="relative mt-10 overflow-hidden rounded-xl border border-border bg-card">
+              <div className="timeline-ruler flex h-8 items-end border-b border-border px-4 pb-2 font-label text-[10px] tracking-widest text-muted-foreground">
+                <span>00:00</span>
+                <span className="ml-auto">00:30</span>
+                <span className="ml-auto">01:00</span>
+              </div>
+              <div className="flex h-10">
+                <div className="w-[18%] bg-zinc-800" />
+                <div className="w-[26%] bg-zinc-700" />
+                <div className="w-[12%] bg-primary" />
+                <div className="w-[30%] bg-zinc-800" />
+                <div className="w-[14%] bg-zinc-700" />
+              </div>
+              <div className="flex items-center justify-between border-t border-border px-4 py-2 font-label text-[10px] tracking-widest text-muted-foreground">
+                <span>WORKSPACE</span>
+                <span>YT/LAYER</span>
+              </div>
+            </div>
+
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              <UploadVideoCard />
+            </div>
+          </main>
         </>
       )}
     </div>

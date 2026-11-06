@@ -13,13 +13,25 @@ export default function Signin() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex justify-center items-center px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
       <div className="w-full max-w-md">
-        <div className="bg-gray-800 shadow-lg rounded-lg p-8">
-          <h2 className="text-3xl font-extrabold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-            Sign In
+        <button
+          onClick={() => router.push("/")}
+          className="font-label mx-auto mb-10 block text-sm font-bold tracking-[0.3em]"
+        >
+          YT<span className="text-primary">/</span>LAYER
+        </button>
+        <div className="rounded-2xl border border-border bg-card p-8">
+          <p className="font-label text-xs tracking-[0.3em] text-primary">
+            WELCOME BACK
+          </p>
+          <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
+            Sign in
           </h2>
-          <form>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Your workspace is waiting. Sign in to pick up where you left off.
+          </p>
+          <form className="mt-8">
             <LabelledInput
               onChange={(e) => setEmail(e.target.value)}
               label="Email"
@@ -69,25 +81,25 @@ export default function Signin() {
                 }
               }}
               type="button"
-              className="w-full text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mt-6 transition-colors duration-300 relative overflow-hidden"
+              className="relative mt-6 w-full overflow-hidden rounded-full bg-primary px-5 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] disabled:opacity-70"
             >
               {loading ? (
-                <div className="flex items-center justify-center">
-                  <div className="absolute inset-0 flex items-center justify-center bg-purple-700">
-                    <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                  </div>
+                <span className="flex items-center justify-center">
+                  <span className="absolute inset-0 flex items-center justify-center bg-primary">
+                    <span className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                  </span>
                   <span className="opacity-0">Sign In</span>
-                </div>
+                </span>
               ) : (
                 "Sign In"
               )}
             </button>
           </form>
-          <p className="text-sm text-gray-400 mt-4 text-center">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             {"Don't have an account?"}{" "}
             <a
               href={"/signup"}
-              className="text-purple-400 hover:text-purple-300 underline"
+              className="font-medium text-primary hover:underline"
             >
               {"Sign Up"}
             </a>
@@ -113,12 +125,12 @@ function LabelledInput({
 }: LabelledInputType) {
   return (
     <div className="mb-4">
-      <label className="block mb-2 text-sm font-medium text-gray-300">
-        {label}
+      <label className="font-label mb-2 block text-xs tracking-widest text-muted-foreground">
+        {label.toUpperCase()}
       </label>
       <input
         type={type || "text"}
-        className="w-full px-3 py-2 text-sm text-white bg-gray-700 border border-gray-600 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+        className="w-full rounded-lg border border-input bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         placeholder={placeholder}
         required
         onChange={onChange}

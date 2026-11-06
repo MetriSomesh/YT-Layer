@@ -55,12 +55,20 @@ export const SearchEditors = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-extrabold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-          Discover Talented Editors
+    <div className="min-h-screen bg-background px-4 py-12 text-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <p className="font-label text-center text-xs tracking-[0.3em] text-muted-foreground">
+          <span className="mr-2 inline-block h-2 w-2 rounded-full bg-primary align-middle" />
+          FIND YOUR EDITOR
+        </p>
+        <h1 className="font-display mt-4 text-center text-4xl font-bold tracking-tight md:text-5xl">
+          Discover talented <span className="text-primary">editors</span>.
         </h1>
-        <div className="max-w-xl mx-auto mb-12">
+        <p className="mx-auto mt-3 max-w-xl text-center leading-relaxed text-muted-foreground">
+          Search by email or phone number, open a profile, and send an
+          invitation.
+        </p>
+        <div className="mx-auto mb-12 mt-10 max-w-xl">
           <div className="relative">
             <input
               type="text"
@@ -68,10 +76,10 @@ export const SearchEditors = () => {
               value={searchTerm}
               onChange={handleSearch}
               onKeyDown={handleKeyPress}
-              className="w-full p-4 pl-12 pr-4 text-gray-900 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full rounded-full border border-input bg-input p-4 pl-12 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <svg
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+              className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -84,37 +92,12 @@ export const SearchEditors = () => {
             </svg>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {loading ? (
-            <div className="flex items-center justify-center w-full h-full">
-              <div className="relative w-24 h-24">
-                <div className="absolute top-0 left-0 w-full h-full border-4 border-purple-500 rounded-full animate-ping opacity-75"></div>
-                <div className="absolute top-0 left-0 w-full h-full border-4 border-purple-300 rounded-full animate-pulse"></div>
-                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                  <svg
-                    className="animate-spin h-8 w-8 text-purple-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-              <span className="ml-3 text-lg font-medium text-purple-300">
-                Please wait...
+            <div className="flex w-full items-center justify-center py-16">
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+              <span className="font-label ml-4 text-xs tracking-[0.3em] text-muted-foreground">
+                PLEASE WAIT
               </span>
             </div>
           ) : (
@@ -123,15 +106,17 @@ export const SearchEditors = () => {
                 <div
                   key={profile.id}
                   onClick={() => handleCardClick(profile.id)}
-                  className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer transform hover:-translate-y-1 hover:scale-105 "
+                  className="cursor-pointer rounded-2xl border border-border bg-card p-6 transition-colors hover:-translate-y-1 hover:border-primary"
                 >
-                  <h2 className="text-2xl font-bold mb-3 text-purple-400">
+                  <h2 className="font-display text-2xl font-bold">
                     {profile.name}
                   </h2>
-                  <p className="text-gray-300">{profile.description}</p>
-                  <div className="mt-4 flex justify-end">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-700 text-purple-100">
-                      View Profile
+                  <p className="mt-2 leading-relaxed text-muted-foreground">
+                    {profile.description}
+                  </p>
+                  <div className="mt-6 flex justify-end">
+                    <span className="font-label inline-flex items-center rounded-full border border-border bg-secondary px-3 py-1 text-[11px] tracking-widest text-foreground">
+                      VIEW PROFILE
                     </span>
                   </div>
                 </div>
@@ -140,7 +125,7 @@ export const SearchEditors = () => {
           )}
         </div>
         {profiles.length === 0 && (
-          <p className="text-center text-gray-400 mt-8">
+          <p className="mt-8 text-center text-muted-foreground">
             No editors found. Try searching for an editor.
           </p>
         )}

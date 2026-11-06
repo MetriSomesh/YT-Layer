@@ -90,69 +90,90 @@ const YoutuberDetailPage = () => {
   };
 
   if (!channelInfo) {
-    return <div>Youtuber not found</div>;
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6 text-foreground">
+        <p className="font-label text-xs tracking-[0.3em] text-muted-foreground">
+          YOUTUBER NOT FOUND
+        </p>
+        <p className="font-display mt-4 text-3xl font-bold tracking-tight">
+          No channel here.
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="mx-auto p-6 min-h-screen bg-gray-900 text-gray-100">
-      <Card className="bg-gray-800 shadow-md rounded-lg p-8">
-        <a href="/eddashboard" className="text-blue-400 hover:text-blue-500">
-          Back to Dashboard
+    <div className="mx-auto min-h-screen bg-background p-6 text-foreground">
+      <Card className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-8 shadow-none">
+        <a
+          href="/eddashboard"
+          className="font-label text-xs tracking-widest text-primary hover:underline"
+        >
+          &larr; Back to Dashboard
         </a>
-        <div className="text-center mt-6">
+        <div className="mt-8 text-center">
           {channelInfo.ChannelPic && (
             <img
               src={channelInfo.ChannelPic}
               alt={channelInfo.title || "Channel Picture"}
-              className="rounded-full mx-auto border-4 border-blue-500"
+              className="mx-auto rounded-full border-4 border-primary"
               width={150}
               height={150}
             />
           )}
-          <h1 className="text-4xl font-bold mt-4 text-blue-400">
+          <p className="font-label mt-6 text-xs tracking-[0.3em] text-muted-foreground">
+            CHANNEL INVITATION
+          </p>
+          <h1 className="font-display mt-3 text-4xl font-bold tracking-tight">
             {channelInfo.title || "No Channel Title"}
           </h1>
-          <p className="text-gray-300 mt-2">{channelInfo.description}</p>
+          <p className="mx-auto mt-2 max-w-2xl leading-relaxed text-muted-foreground">
+            {channelInfo.description}
+          </p>
         </div>
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <h2 className="text-2xl font-bold text-blue-400">
-              Subscriber Count
+        <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="rounded-2xl border border-border bg-secondary p-6 text-center">
+            <h2 className="font-label text-xs tracking-[0.3em] text-muted-foreground">
+              SUBSCRIBERS
             </h2>
-            <p className="text-gray-300 mt-2">
+            <p className="font-display mt-3 text-2xl font-bold">
               {channelInfo.subscriberCount || "N/A"}
             </p>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-blue-400">Views Count</h2>
-            <p className="text-gray-300 mt-2">
+          <div className="rounded-2xl border border-border bg-secondary p-6 text-center">
+            <h2 className="font-label text-xs tracking-[0.3em] text-muted-foreground">
+              VIEWS
+            </h2>
+            <p className="font-display mt-3 text-2xl font-bold">
               {channelInfo.viewCount || "N/A"}
             </p>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-blue-400">Video Count</h2>
-            <p className="text-gray-300 mt-2">
+          <div className="rounded-2xl border border-border bg-secondary p-6 text-center">
+            <h2 className="font-label text-xs tracking-[0.3em] text-muted-foreground">
+              VIDEOS
+            </h2>
+            <p className="font-display mt-3 text-2xl font-bold">
               {channelInfo.videoCount || "N/A"}
             </p>
           </div>
         </div>
         <div className="mt-10 flex justify-center space-x-4">
           {actionCompleted ? (
-            <div className="text-xl text-green-400">
-              Invitation{" "}
-              {actionCompleted === "accepted" ? "accepted" : "rejected"}{" "}
-              successfully.
+            <div className="font-label text-sm tracking-widest text-primary">
+              INVITATION{" "}
+              {actionCompleted === "accepted" ? "ACCEPTED" : "REJECTED"}{" "}
+              SUCCESSFULLY
             </div>
           ) : (
             <>
               <Button
-                className="bg-green-500 hover:bg-green-600"
+                className="rounded-full bg-primary px-6 py-2 font-bold text-white hover:bg-primary"
                 onClick={() => handleAcceptClick(currentInvitation)}
                 disabled={loadingReject || loadingAccept}
               >
                 {loadingAccept ? (
                   <svg
-                    className="animate-spin h-5 w-5 text-white"
+                    className="h-5 w-5 animate-spin text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -176,13 +197,13 @@ const YoutuberDetailPage = () => {
                 )}
               </Button>
               <Button
-                className="bg-red-500 hover:bg-red-600"
+                className="rounded-full border border-border bg-transparent px-6 py-2 font-bold text-foreground hover:border-foreground hover:bg-secondary"
                 onClick={() => handleRejectClick(currentInvitation)}
                 disabled={loadingAccept || loadingReject}
               >
                 {loadingReject ? (
                   <svg
-                    className="animate-spin h-5 w-5 text-white"
+                    className="h-5 w-5 animate-spin text-foreground"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -208,14 +229,14 @@ const YoutuberDetailPage = () => {
             </>
           )}
         </div>
-        <div className="mt-4 flex justify-center">
+        <div className="mt-6 flex justify-center">
           <a
             href={`https://youtube.com/channel/${channelInfo.channelId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-500"
+            className="font-label text-xs tracking-widest text-primary hover:underline"
           >
-            View Channel
+            VIEW CHANNEL
           </a>
         </div>
       </Card>

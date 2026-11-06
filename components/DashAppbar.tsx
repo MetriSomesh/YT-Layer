@@ -43,7 +43,7 @@ export const DashAppbar = () => {
   const [profilePic, setProfilePic] = useRecoilState(channelProfilePicState);
   const Spinner = () => (
     <div className="flex justify-center items-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-500"></div>
+      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
     </div>
   );
 
@@ -116,19 +116,22 @@ export const DashAppbar = () => {
   };
 
   return (
-    <nav className="bg-gray-900 shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex-shrink-0">
-            <span className="text-white text-2xl font-bold">YT-Layer</span>
-          </div>
+    <nav className="border-b border-border bg-background text-foreground">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="flex h-16 items-center justify-between">
+          <button
+            onClick={() => router.push("/ytdashboard")}
+            className="font-label text-sm font-bold tracking-[0.3em]"
+          >
+            YT<span className="text-primary">/</span>LAYER
+          </button>
           <div className="flex items-center space-x-4">
             <DropdownMenu onOpenChange={hasNewNotification}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative text-gray-300 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-white"
+                  className="relative text-muted-foreground hover:bg-secondary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <Image
                     src={notificationIcon}
@@ -136,27 +139,27 @@ export const DashAppbar = () => {
                     className="w-6 h-6"
                   />
                   {newYtNotification && (
-                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-gray-900 bg-red-500"></span>
+                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-primary ring-2 ring-background"></span>
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-80 mt-2 bg-gray-800 rounded-md shadow-lg border border-gray-700">
-                <DropdownMenuLabel className="px-4 py-2 text-lg font-semibold text-gray-200">
-                  Notifications
+              <DropdownMenuContent className="mt-2 w-80 rounded-xl border border-border bg-card shadow-lg">
+                <DropdownMenuLabel className="font-label px-4 py-3 text-xs tracking-[0.3em] text-muted-foreground">
+                  NOTIFICATIONS
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gray-700" />
+                <DropdownMenuSeparator className="bg-border" />
                 {loading ? (
                   <div className="flex justify-center items-center p-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-300"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
                   </div>
                 ) : (
                   <DropdownMenuGroup>
                     {ytNotification ? (
                       <DropdownMenuItem
-                        className={`p-4 hover:bg-gray-700 ${
+                        className={`p-4 hover:bg-secondary ${
                           ytNotification?.viewed
-                            ? "text-gray-400"
-                            : "font-semibold text-gray-200"
+                            ? "text-muted-foreground"
+                            : "font-semibold text-foreground"
                         }`}
                         onClick={() => {}}
                       >
@@ -165,7 +168,7 @@ export const DashAppbar = () => {
                             <AvatarImage
                               src={ytNotification.editor.profile_pic || ""}
                             />
-                            <AvatarFallback className="bg-gray-600 text-white">
+                            <AvatarFallback className="bg-secondary text-foreground">
                               ED
                             </AvatarFallback>
                           </Avatar>
@@ -178,14 +181,14 @@ export const DashAppbar = () => {
                               handleOkButton(ytNotification.id);
                               router.refresh();
                             }}
-                            className="ml-auto bg-gray-700 hover:bg-gray-600 text-white"
+                            className="ml-auto bg-secondary text-foreground hover:bg-muted"
                           >
                             Ok
                           </Button>
                         </div>
                       </DropdownMenuItem>
                     ) : (
-                      <DropdownMenuItem className="p-4 text-gray-400">
+                      <DropdownMenuItem className="p-4 text-muted-foreground">
                         No notifications
                       </DropdownMenuItem>
                     )}
@@ -199,27 +202,27 @@ export const DashAppbar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="relative bg-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-white"
+                  className="relative bg-transparent focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <Avatar>
                     <AvatarImage src={profilePic || ""} />
-                    <AvatarFallback className="bg-gray-600 text-white">
+                    <AvatarFallback className="bg-secondary text-foreground">
                       YT
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 mt-2 bg-gray-800 rounded-md shadow-lg border border-gray-700">
-                <DropdownMenuLabel className="px-4 py-2 text-lg font-semibold text-gray-200">
-                  Profile
+              <DropdownMenuContent className="mt-2 w-56 rounded-xl border border-border bg-card shadow-lg">
+                <DropdownMenuLabel className="font-label px-4 py-3 text-xs tracking-[0.3em] text-muted-foreground">
+                  PROFILE
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-gray-700" />
+                <DropdownMenuSeparator className="bg-border" />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-gray-300">
+                  <DropdownMenuItem className="cursor-pointer px-4 py-2 text-foreground hover:bg-secondary">
                     Edit Profile
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="px-4 py-2 hover:bg-gray-700 cursor-pointer text-gray-300"
+                    className="cursor-pointer px-4 py-2 text-foreground hover:bg-secondary"
                     onClick={handleSignOut}
                   >
                     Logout

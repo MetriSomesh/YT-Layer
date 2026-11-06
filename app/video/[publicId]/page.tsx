@@ -168,56 +168,72 @@ const VideoPlayerPage = ({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background text-foreground">
+        <div className="h-12 w-12 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+        <p className="font-label mt-6 text-xs tracking-[0.3em] text-muted-foreground">
+          LOADING VIDEO
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-red-500 text-xl">{error}</div>
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="text-xl text-destructive">{error}</div>
       </div>
     );
   }
 
   if (!videoDelivery) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-xl">No video data available.</div>
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="text-xl text-muted-foreground">No video data available.</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 lg:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="aspect-w-16 aspect-h-9 mb-4">
+    <div className="min-h-screen bg-background p-4 text-foreground lg:p-8">
+      <div className="mx-auto max-w-6xl">
+        <p className="font-label mb-6 text-xs tracking-[0.3em] text-muted-foreground">
+          <span className="mr-2 inline-block h-2 w-2 rounded-full bg-primary align-middle" />
+          REVIEW ROOM
+        </p>
+        <div className="mb-6 overflow-hidden rounded-2xl border border-border bg-card">
           <video
             src={videoDelivery.secure_url}
             controls
-            className="rounded-lg w-full h-full object-cover"
+            className="aspect-video w-full object-cover"
           />
+          <div className="timeline-ruler flex h-8 items-end border-t border-border px-4 pb-2 font-label text-[10px] tracking-widest text-muted-foreground">
+            <span>00:00</span>
+            <span className="ml-auto">
+              {Math.floor(videoDelivery.duration / 60)}:
+              {(videoDelivery.duration % 60).toString().padStart(2, "0")}
+            </span>
+          </div>
         </div>
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col gap-6 lg:flex-row">
           <div className="w-full lg:w-2/3">
-            <h1 className="text-2xl font-bold mb-2">{videoDelivery.title}</h1>
-            <div className="flex items-center justify-between mb-4">
-              <div className="text-sm text-gray-400">
+            <h1 className="font-display text-3xl font-bold tracking-tight">
+              {videoDelivery.title}
+            </h1>
+            <div className="mb-4 mt-3 flex flex-wrap items-center justify-between gap-4">
+              <div className="font-label text-xs tracking-widest text-muted-foreground">
                 {Math.floor(videoDelivery.duration / 60)}:
                 {(videoDelivery.duration % 60).toString().padStart(2, "0")} |{" "}
                 {videoDelivery.format.toUpperCase()}
               </div>
               {isYoutuber && (
-                <div className="flex space-x-4">
+                <div className="flex flex-wrap gap-3">
                   <Button
-                    className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    className="flex items-center space-x-2 rounded-full bg-primary px-5 py-2 font-bold text-white hover:bg-primary"
                     onClick={handleUploadToYoutube}
                     disabled={uploadLoading || discardLoading}
                   >
                     {uploadLoading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                     ) : (
                       <FaYoutube className="mr-2" />
                     )}
@@ -225,12 +241,12 @@ const VideoPlayerPage = ({
                   </Button>
 
                   <Button
-                    className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                    className="flex items-center space-x-2 rounded-full border border-border bg-transparent px-5 py-2 font-bold text-foreground hover:border-foreground hover:bg-secondary"
                     onClick={handleDiscardVideo}
                     disabled={uploadLoading || discardLoading}
                   >
                     {discardLoading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-foreground border-t-transparent"></div>
                     ) : (
                       <FaTrash className="mr-2" />
                     )}
@@ -239,13 +255,15 @@ const VideoPlayerPage = ({
                 </div>
               )}
             </div>
-            <div className="bg-gray-800 rounded-lg p-4 mb-4">
-              <p className="text-sm mb-2">{videoDelivery.descrption}</p>
+            <div className="mb-4 rounded-2xl border border-border bg-card p-5">
+              <p className="mb-3 text-sm leading-relaxed text-muted-foreground">
+                {videoDelivery.descrption}
+              </p>
               <div className="flex flex-wrap gap-2">
                 {videoDelivery.tags.split(",").map((tag, index) => (
                   <span
                     key={index}
-                    className="bg-gray-700 text-xs px-2 py-1 rounded-full"
+                    className="font-label rounded-full border border-border bg-secondary px-3 py-1 text-[11px] tracking-widest text-foreground"
                   >
                     {tag.trim()}
                   </span>

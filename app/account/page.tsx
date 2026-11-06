@@ -94,23 +94,29 @@ export default function SetupAccount() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-        <div className="px-6 py-8">
-          <h2 className="text-3xl font-extrabold text-center text-white mb-8">
+    <div className="min-h-screen bg-background px-4 py-12 text-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-xl overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="px-6 py-8 sm:px-10">
+          <p className="font-label text-xs tracking-[0.3em] text-primary">
+            EDITOR PROFILE
+          </p>
+          <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
             Set up your account
           </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Tell channels who you are, what you cut, and where you work from.
+          </p>
           {error && (
-            <div className="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+            <div className="mb-4 mt-6 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               <p>{error}</p>
             </div>
           )}
-          <form className="space-y-6">
+          <form className="mt-8 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300">
-                Profile Picture <span className="text-red-500">*</span>
+              <label className="font-label block text-xs tracking-widest text-muted-foreground">
+                PROFILE PICTURE <span className="text-primary">*</span>
               </label>
-              <div className="mt-1 flex items-center">
+              <div className="mt-2 flex items-center">
                 <input
                   type="file"
                   onChange={handleFileChange}
@@ -119,10 +125,10 @@ export default function SetupAccount() {
                 />
                 <label
                   htmlFor="profile-picture"
-                  className="cursor-pointer bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-md inline-flex items-center transition duration-300"
+                  className="inline-flex cursor-pointer items-center rounded-full bg-secondary px-4 py-2 text-sm font-medium text-foreground transition duration-300 hover:bg-muted"
                 >
                   <svg
-                    className="w-5 h-5 mr-2"
+                    className="mr-2 h-5 w-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -138,7 +144,7 @@ export default function SetupAccount() {
                   Choose File
                 </label>
                 {profilePicture && (
-                  <span className="ml-3 text-sm text-gray-400">
+                  <span className="ml-3 text-sm text-muted-foreground">
                     {profilePicture.name}
                   </span>
                 )}
@@ -146,76 +152,76 @@ export default function SetupAccount() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300">
-                Description about editing skills
+              <label className="font-label block text-xs tracking-widest text-muted-foreground">
+                DESCRIPTION ABOUT EDITING SKILLS
               </label>
               <textarea
                 onChange={(e) => setDescription(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="mt-2 block w-full rounded-lg border border-input bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 placeholder="Describe your editing skills"
                 rows={4}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300">
-                Experience in years
+              <label className="font-label block text-xs tracking-widest text-muted-foreground">
+                EXPERIENCE IN YEARS
               </label>
               <input
                 onChange={(e) => setExperience(e.target.value)}
                 type="number"
-                className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="mt-2 block w-full rounded-lg border border-input bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 placeholder="Enter your experience in years"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300">
-                Phone Number <span className="text-red-500">*</span>
+              <label className="font-label block text-xs tracking-widest text-muted-foreground">
+                PHONE NUMBER <span className="text-primary">*</span>
               </label>
               <input
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 type="text"
-                className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="mt-2 block w-full rounded-lg border border-input bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 placeholder="Enter your phone number"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300">
-                Country <span className="text-red-500">*</span>
+              <label className="font-label block text-xs tracking-widest text-muted-foreground">
+                COUNTRY <span className="text-primary">*</span>
               </label>
               <input
                 onChange={(e) => setCountry(e.target.value)}
                 type="text"
-                className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="mt-2 block w-full rounded-lg border border-input bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 placeholder="Enter your country"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300">
-                State <span className="text-red-500">*</span>
+              <label className="font-label block text-xs tracking-widest text-muted-foreground">
+                STATE <span className="text-primary">*</span>
               </label>
               <input
                 onChange={(e) => setState(e.target.value)}
                 type="text"
-                className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="mt-2 block w-full rounded-lg border border-input bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 placeholder="Enter your state"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300">
-                City <span className="text-red-500">*</span>
+              <label className="font-label block text-xs tracking-widest text-muted-foreground">
+                CITY <span className="text-primary">*</span>
               </label>
               <input
                 onChange={(e) => setCity(e.target.value)}
                 type="text"
-                className="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="mt-2 block w-full rounded-lg border border-input bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 placeholder="Enter your city"
                 required
               />
@@ -226,10 +232,10 @@ export default function SetupAccount() {
                 <button
                   disabled
                   type="button"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                  className="flex w-full justify-center rounded-full bg-primary px-4 py-3 text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    className="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -254,7 +260,7 @@ export default function SetupAccount() {
                 <button
                   onClick={handleSubmit}
                   type="button"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-300"
+                  className="flex w-full justify-center rounded-full bg-primary px-4 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   Continue
                 </button>

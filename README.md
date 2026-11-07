@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# YT-Layer
 
-## Getting Started
+A Next.js app that connects YouTubers with video editors: sign up, connect a
+YouTube channel, upload videos, and manage editor invitations.
 
-First, run the development server:
+## Tech stack
+
+- Next.js 14 (App Router)
+- Prisma + PostgreSQL (Neon)
+- NextAuth (credentials) + Google OAuth (YouTube)
+- Recoil, Tailwind CSS, shadcn/ui, Framer Motion
+- Cloudinary (video/image uploads), imgbb (profile pictures)
+
+## Local setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Create a database
+
+Create a free Postgres project at [console.neon.tech](https://console.neon.tech),
+then copy the **pooled** connection string from **Dashboard → Connect**
+(host contains `-pooler`).
+
+### 3. Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Fill in `.env`:
+
+| Variable | What it is |
+| --- | --- |
+| `DATABASE_URL` | Neon pooled Postgres connection string |
+| `NEXTAUTH_URL` | Public origin, e.g. `http://localhost:3000` |
+| `NEXTAUTH_SECRET` / `JWT_SECRET` | Random secrets — `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth client |
+| `GOOGLE_REDIRECT_URI`, `GOOGLE_UPLOAD_REDIRECT_URI` | `<origin>/api/google/callback`, `<origin>/api/upload/callback` |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `CLOUDINARY_UPLOAD_PRESET` | Cloudinary credentials |
+| `API_KEY` | imgbb API key (profile pictures) |
+
+Add both redirect URIs to the OAuth client in Google Cloud Console.
+
+`.env` is git-ignored. Never commit real credentials.
+
+### 4. Set up the schema
+
+For a brand-new database, apply the migration history:
+
+```bash
+npm run db:deploy
+```
+
+Or, during early development, push the schema directly:
+
+```bash
+npx prisma db push
+```
+
+### 5. Run the app
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment (free tier)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+The app is ready to deploy on **Azure App Service F1 (free)** or an
+**AWS EC2 free-tier instance** with the included `Dockerfile`. See
+[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the full walkthrough, environment
+variables, migrations, and a GitHub Actions workflow.
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the dev server on port 3000 |
+| `npm run build` | Generate the Prisma client and build for production |
+| `npm run start` | Start the production server |
+| `npm run start:migrate` | Apply migrations, then start the production server |
+| `npm run db:deploy` | Apply pending Prisma migrations |
+| `npm run lint` | Run ESLint |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Health check
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+`GET /api/health` returns `{ "status": "ok" }` without touching the database.
+Add `?db=1` to include a database connectivity check.

@@ -1,17 +1,15 @@
-import { PrismaClient, UserType } from "@prisma/client";
+import { UserType } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
   try {
-    await prisma.$connect();
 
     const body = await req.json();
     const { publicId, ...formData } = body;
 
     if (!formData) {
-      await prisma.$disconnect();
       return NextResponse.json(
         {
           msg: "Form data not received",
@@ -58,7 +56,6 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
       },
     });
 
-    await prisma.$disconnect();
     return NextResponse.json(
       {
         msg: "Video record created successfully",
@@ -67,7 +64,6 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
       { status: 201 }
     );
   } catch (error) {
-    await prisma.$disconnect();
     console.error("Error creating video record:", error);
     return NextResponse.json(
       {

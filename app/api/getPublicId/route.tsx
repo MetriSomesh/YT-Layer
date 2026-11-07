@@ -1,17 +1,14 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
   const { youtuberId, editorId } = body;
 
   try {
-    await prisma.$connect();
 
     if (!editorId && !youtuberId) {
-      prisma.$disconnect();
       return NextResponse.json(
         {
           msg: "Id not found",
@@ -35,7 +32,6 @@ export const POST = async (req: NextRequest) => {
     }
 
     if (!pubId) {
-      prisma.$disconnect();
       return NextResponse.json(
         {
           msg: "Public Id is not present",
@@ -44,7 +40,6 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    await prisma.$disconnect();
     return NextResponse.json(
       {
         msg: "Public Id exists",
@@ -53,7 +48,6 @@ export const POST = async (req: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
-    await prisma.$disconnect();
     console.error("Error occurred :", error);
     return NextResponse.json(
       {

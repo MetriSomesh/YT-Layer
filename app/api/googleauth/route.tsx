@@ -1,12 +1,22 @@
 import { google } from "googleapis";
 import { NextRequest, NextResponse } from "next/server";
-import OAUTH2Data from "../../../credentials.json";
-import { middleware } from "../../middleware";
+
+
+// Reads credentials from the environment at request time, so it must not be
+// baked into a static response at build time.
+export const dynamic = "force-dynamic";
 
 export const GET = async (req: NextRequest) => {
-  const CLIENT_ID = OAUTH2Data.web.client_id;
-  const CLIENT_SECRET = OAUTH2Data.web.client_secret;
-  const REDIRECT_URL = OAUTH2Data.web.redirect_uris[0];
+  const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+  const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+  const REDIRECT_URL = process.env.GOOGLE_REDIRECT_URI;
+
+  if (!CLIENT_ID || !CLIENT_SECRET || !REDIRECT_URL) {
+    return NextResponse.json(
+      { msg: "Google OAuth is not configured on this deployment" },
+      { status: 500 }
+    );
+  }
 
   const oAuth2Client = new google.auth.OAuth2(
     CLIENT_ID,

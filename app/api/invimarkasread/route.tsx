@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
@@ -12,7 +11,6 @@ export const POST = async (req: NextRequest) => {
   }
 
   try {
-    await prisma.$connect();
     const invitation = await prisma.invitation.update({
       where: {
         id: invitationId,
@@ -22,7 +20,6 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
-    await prisma.$disconnect();
 
     if (invitation.viewed === false) {
       return NextResponse.json(
@@ -41,7 +38,6 @@ export const POST = async (req: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
-    await prisma.$disconnect();
     console.error(
       "Error occured while trying invitation to mark as read:",
       error

@@ -1,13 +1,12 @@
 import { google } from "googleapis";
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import OAUTH2Data from "../../../../credentials.json";
-const prisma = new PrismaClient();
+import { prisma } from "@/app/lib/prisma";
+
 
 export const GET = async (req: NextRequest) => {
-  const CLIENT_ID = OAUTH2Data.web.client_id;
-  const CLIENT_SECRET = OAUTH2Data.web.client_secret;
-  const REDIRECT_URL = OAUTH2Data.web.redirect_uris[0];
+  const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+  const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+  const REDIRECT_URL = process.env.GOOGLE_REDIRECT_URI;
 
   const oAuth2Client = new google.auth.OAuth2(
     CLIENT_ID,
@@ -42,7 +41,6 @@ export const GET = async (req: NextRequest) => {
     // const user = await prisma.user.findFirst({
     //   where: { id: req.user.id }, // Assuming you have the authenticated user's id in req.user
     // });
-    await prisma.$connect();
     const user = await prisma.user.findFirst({
       where: {
         email: userEmail,
@@ -78,7 +76,6 @@ export const GET = async (req: NextRequest) => {
         const profilePicture = channelInfo?.snippet?.thumbnails?.default?.url;
         console.log("Profile Picture URL:", profilePicture);
         try {
-          await prisma.$connect();
           if (user) {
             const youtuberId = await prisma.youTuber.findUnique({
               where: {
@@ -110,24 +107,22 @@ export const GET = async (req: NextRequest) => {
                     channelInfo.statistics?.hiddenSubscriberCount || false,
                 },
               });
-              await prisma.$disconnect();
               console.log("Channel created");
             }
           } else {
             console.log("user not found for the channle");
           }
         } catch (error) {
-          await prisma.$disconnect();
           console.error(error);
         }
       } else {
         console.log("No channel info found");
       }
     }
-    await prisma.$disconnect();
-    return NextResponse.redirect("https://yt-layer-rho.vercel.app/signin");
+    return NextResponse.redirect(
+      new URL("/signin", process.env.NEXTAUTH_URL || req.nextUrl.origin)
+    );
   } catch (error) {
-    await prisma.$disconnect();
     console.error(
       "Error exchanging authorization code for access token:",
       error

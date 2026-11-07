@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { v2 as cloudinary } from "cloudinary";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,12 +7,10 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-const prisma = new PrismaClient();
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
 
   try {
-    await prisma.$connect();
     const { publicId } = body;
     if (!publicId) {
       return NextResponse.json(
@@ -36,13 +34,11 @@ export const POST = async (req: NextRequest) => {
     const result = await cloudinary.uploader.destroy(publicId, {
       resource_type: "video",
     });
-    await prisma.$disconnect();
     return NextResponse.json(
       { msg: "Video is deleted succesfully" },
       { status: 200 }
     );
   } catch (error) {
-    await prisma.$disconnect();
     return NextResponse.json({
       msg: "Error deleting video",
       error,

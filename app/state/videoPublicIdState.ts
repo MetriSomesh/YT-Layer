@@ -2,6 +2,6 @@
 import { atom } from "recoil";
 
 export const videoPublicIdState = atom<string | null>({
-  key: "editorIdState",
+  key: "videoPublicIdState",
   default: null,
 });

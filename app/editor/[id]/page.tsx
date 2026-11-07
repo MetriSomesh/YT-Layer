@@ -1,17 +1,14 @@
 // app/editor/[id]/page.tsx
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import EditorDetail from "./EditorDetail";
 
-const prisma = new PrismaClient();
 
 async function getEditorData(id: number) {
-  await prisma.$connect();
   const editor = await prisma.editor.findUnique({
     where: { id: id },
     include: { user: true },
   });
   console.log(editor);
-  await prisma.$disconnect();
   return editor;
 }
 

@@ -1,7 +1,7 @@
-import { PrismaClient, UserType } from "@prisma/client";
+import { UserType } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 export const POST = async (req: NextRequest, res: NextResponse) => {
   try {
     const body = await req.json();
@@ -13,13 +13,11 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         { status: 400 }
       );
     }
-    await prisma.$connect();
     const accessChannel = await prisma.channel.findUnique({
       where: { youtuberId: id },
     });
 
     if (!accessChannel) {
-      await prisma.$disconnect();
       return NextResponse.json(
         { msg: "channel does not exists" },
         { status: 404 }
@@ -30,13 +28,11 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
       "The channel is found ----------------------------",
       accessChannel
     );
-    await prisma.$disconnect();
     return NextResponse.json({
       msg: "channel connected",
       channelInfo: accessChannel,
     });
   } catch (error) {
-    await prisma.$disconnect();
     console.error("Error fetching  channel info :", error);
     return NextResponse.json(
       {

@@ -1,16 +1,13 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   try {
-    await prisma.$connect();
     const body = await req.json();
     const { invitationId, status } = body;
 
     if (!invitationId || !status) {
-      await prisma.$disconnect();
       return NextResponse.json({ msg: "Bad request", status: 400 });
     }
     const invitation = await prisma.invitation.findUnique({
@@ -20,7 +17,6 @@ export const POST = async (req: NextRequest) => {
     });
 
     if (!invitation) {
-      await prisma.$disconnect();
       return NextResponse.json(
         { msg: "Invitation does not exists" },
         { status: 404 }
@@ -36,7 +32,6 @@ export const POST = async (req: NextRequest) => {
     });
 
     if (!newNotification) {
-      await prisma.$disconnect();
       return NextResponse.json(
         {
           msg: "Failed to create notification",
@@ -44,7 +39,6 @@ export const POST = async (req: NextRequest) => {
         { status: 500 }
       );
     }
-    await prisma.$disconnect();
     return NextResponse.json(
       {
         msg: "Notification created successfully",
@@ -53,7 +47,6 @@ export const POST = async (req: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
-    await prisma.$disconnect();
     console.error(error);
     return NextResponse.json(
       {

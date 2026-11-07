@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
@@ -12,7 +11,6 @@ export const POST = async (req: NextRequest) => {
   }
 
   try {
-    await prisma.$connect();
     const Isinvitation = await prisma.editor.findUnique({
       where: { id: editorId },
       include: {
@@ -26,7 +24,6 @@ export const POST = async (req: NextRequest) => {
 
     console.log(Isinvitation);
     if (Isinvitation?.invitation.length === 0) {
-      await prisma.$disconnect();
       return NextResponse.json(
         { msg: "Invitation not found" },
         { status: 404 }
@@ -38,7 +35,6 @@ export const POST = async (req: NextRequest) => {
     //   return NextResponse.json({ msg: "Invitation not found" }, { status: 404 });
     // }
 
-    await prisma.$disconnect();
     return NextResponse.json(
       {
         msg: "Invitation Found",
@@ -47,7 +43,6 @@ export const POST = async (req: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
-    await prisma.$disconnect();
     console.error("Error updating editor:", error);
     return NextResponse.json(
       {

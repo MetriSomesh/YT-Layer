@@ -1,8 +1,7 @@
 import { notificationState } from "@/app/state/notificationState";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
@@ -13,7 +12,6 @@ export const POST = async (req: NextRequest) => {
   }
 
   try {
-    await prisma.$connect();
     const notification = await prisma.youTuberNotification.findUnique({
       where: {
         youtuberId: youtuberId,
@@ -23,9 +21,7 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
-    await prisma.$disconnect();
     if (!notification) {
-      await prisma.$disconnect();
       return NextResponse.json(
         {
           msg: "Notification not found",
@@ -41,7 +37,6 @@ export const POST = async (req: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
-    await prisma.$disconnect();
     console.error("Error checking notification:", error);
     return NextResponse.json(
       {

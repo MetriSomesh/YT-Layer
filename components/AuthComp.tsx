@@ -13,6 +13,7 @@ export default function AuthComp({ type }: { type: string }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const userType =
     typeof localStorage !== "undefined" &&
     localStorage.getItem("userType") === "YOUTUBER"
@@ -73,32 +74,44 @@ export default function AuthComp({ type }: { type: string }) {
               type="password"
               placeholder="••••••••"
             />
+            {error && (
+              <p className="mt-2 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                {error}
+              </p>
+            )}
             <button
               onClick={async () => {
                 setLoading(true);
-                const res = await axios.post(
-                  "https://yt-layer-rho.vercel.app/api/signup",
-                  {
+                setError(null);
+                try {
+                  const res = await axios.post("/api/signup", {
                     username,
                     email,
                     password,
                     userType,
+                  });
+                  setUserEmail(email);
+                  if (res.status === 201) {
+                    if (userType === UserType.YOUTUBER) {
+                      localStorage.setItem("userEmail", email);
+                      const googleRes = await axios.get("/api/googleauth");
+                      const url = googleRes.data.authUrl;
+                      router.push(url);
+                    } else {
+                      localStorage.setItem("userEmail", email);
+                      localStorage.setItem("userId", res.data.user.id);
+                      router.push("/account");
+                    }
                   }
-                );
-                setUserEmail(email);
-                if (res.status === 201) {
-                  if (userType === UserType.YOUTUBER) {
-                    localStorage.setItem("userEmail", email);
-                    const res = axios.get(
-                      "https://yt-layer-rho.vercel.app/api/googleauth"
-                    );
-                    const url = (await res).data.authUrl;
-                    router.push(url);
-                  } else {
-                    localStorage.setItem("userEmail", email);
-                    localStorage.setItem("userId", res.data.user.id);
-                    router.push("/account");
-                  }
+                } catch (err) {
+                  const message =
+                    axios.isAxiosError(err) &&
+                    typeof err.response?.data?.msg === "string"
+                      ? err.response.data.msg
+                      : "Something went wrong. Please try again.";
+                  setError(message);
+                } finally {
+                  setLoading(false);
                 }
               }}
               type="button"

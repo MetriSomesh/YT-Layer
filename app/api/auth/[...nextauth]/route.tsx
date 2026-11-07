@@ -1,10 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { SignJWT, importJWK } from "jose";
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
 
 interface CustomUser {
   id: string;
@@ -14,7 +13,10 @@ interface CustomUser {
 }
 
 const generateJWT = async (payload: any) => {
-  const secret = process.env.JWT_SECRET || "secret";
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET is not set");
+  }
   const jwk = await importJWK({ k: secret, alg: "HS256", kty: "oct" });
   const jwt = await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -33,13 +35,11 @@ const handler = NextAuth({
         password: { label: "password", type: "password", placeholder: "" },
       },
       async authorize(credentials: any) {
-        await prisma.$connect();
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
 
         if (!user) {
-          await prisma.$disconnect();
           return null;
         }
 
@@ -48,12 +48,10 @@ const handler = NextAuth({
           user.password
         );
         if (!isPasswordValid) {
-          await prisma.$disconnect();
           return null;
         }
 
         const jwtToken = await generateJWT({ id: user.id });
-        await prisma.$disconnect();
         return {
           id: user.id.toString(),
           name: user.username,
@@ -86,7 +84,7 @@ const handler = NextAuth({
     },
   },
   pages: {
-    signIn: "https://yt-layer-rho.vercel.app/signin",
+    signIn: "/signin",
   },
 });
 

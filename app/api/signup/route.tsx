@@ -1,36 +1,26 @@
-import { PrismaClient, UserType } from "@prisma/client";
+import { UserType } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-const prisma = new PrismaClient();
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
 
   const { username, email, password, userType } = body;
-  await prisma.$connect();
   const existingUser = await prisma.user.findUnique({
     where: { email },
   });
 
   if (existingUser) {
-    // await prisma.invitation.deleteMany();
-    await prisma.youTuberNotification.deleteMany();
-    await prisma.channel.deleteMany();
-    await prisma.youTuber.deleteMany();
-    await prisma.user.deleteMany();
-    // await prisma.editor.deleteMany();
-    // Now delete all records from the User table
-    // return NextResponse.json(
-    //   {
-    //     msg: "Email is already registered",
-    //   },
-    //   { status: 400 }
-    // );
+    return NextResponse.json(
+      {
+        msg: "Email is already registered",
+      },
+      { status: 409 }
+    );
   }
 
   try {
-    const userPassword = password;
-    const finalPass = await bcrypt.hash(userPassword, 10);
-    console.log("THE ENCRYPTID Passwordk : ", finalPass);
+    const finalPass = await bcrypt.hash(password, 10);
     const newUser = await prisma.user.create({
       data: {
         username,
@@ -38,8 +28,13 @@ export const POST = async (req: NextRequest) => {
         password: finalPass,
         userType,
       },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        userType: true,
+      },
     });
-    await prisma.$disconnect();
     return NextResponse.json(
       {
         msg: "User Created",
@@ -48,7 +43,6 @@ export const POST = async (req: NextRequest) => {
       { status: 201 }
     );
   } catch (error) {
-    await prisma.$disconnect();
     console.error(error);
     return NextResponse.json(
       {

@@ -1,16 +1,13 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   try {
-    await prisma.$connect();
     const body = await req.json();
     const { invitationId, status } = body;
 
     if (!invitationId || !status) {
-      await prisma.$disconnect();
       return NextResponse.json({ msg: "Bad request", status: 400 });
     }
 
@@ -23,7 +20,6 @@ export const POST = async (req: NextRequest) => {
         });
 
         if (!invitation) {
-          await prisma.$disconnect();
           return NextResponse.json(
             {
               msg: "Unable to delete invitation",
@@ -40,7 +36,6 @@ export const POST = async (req: NextRequest) => {
           });
 
           if (!updateEditor) {
-            await prisma.$disconnect();
             return NextResponse.json(
               {
                 msg: "Unable to update editor data",
@@ -56,7 +51,6 @@ export const POST = async (req: NextRequest) => {
           });
 
           if (!updateYoutuber) {
-            await prisma.$disconnect();
             return NextResponse.json(
               {
                 msg: "Unable to update youtuber data",
@@ -69,7 +63,6 @@ export const POST = async (req: NextRequest) => {
           });
 
           if (!deleteInvitation) {
-            await prisma.$disconnect();
             return NextResponse.json(
               {
                 msg: "Error deleting invitation",
@@ -80,12 +73,10 @@ export const POST = async (req: NextRequest) => {
             );
           }
         }
-        await prisma.$disconnect();
         return NextResponse.json({
           msg: "Invitation accepted successfully",
         });
       } catch (error) {
-        await prisma.$disconnect();
         console.error("Error performing operations:", error);
         return NextResponse.json({
           msg: error,
@@ -94,7 +85,6 @@ export const POST = async (req: NextRequest) => {
       }
     }
   } catch (error) {
-    await prisma.$disconnect();
     console.error(error);
     return NextResponse.json({
       msg: error,

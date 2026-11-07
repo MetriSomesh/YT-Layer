@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
 export const POST = async (req: NextRequest) => {
   const body = await req.json();
@@ -12,7 +11,6 @@ export const POST = async (req: NextRequest) => {
   }
 
   try {
-    await prisma.$connect();
     const invitations = await prisma.invitation.findMany({
       where: {
         editorId: editorId,
@@ -23,7 +21,6 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
-    await prisma.$disconnect();
 
     if (invitations.length === 0) {
       return NextResponse.json({ msg: "No new invitations" }, { status: 201 });
@@ -37,7 +34,6 @@ export const POST = async (req: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
-    await prisma.$disconnect();
     console.error("Error checking invitation:", error);
     return NextResponse.json(
       {

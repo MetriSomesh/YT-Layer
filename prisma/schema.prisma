@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://neondb_owner:p5JwVEOQ6UPD@ep-falling-heart-a1znpd74-pooler.ap-southeast-1.aws.neon.tech/prisma_migrate_shadow_db_48099697-d65a-48e7-9cdf-473d150ee4e0?sslmode=require"
+  url      = env("DATABASE_URL")
 }
 
 enum UserType {

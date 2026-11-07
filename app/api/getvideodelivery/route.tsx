@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/app/lib/prisma";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -8,11 +8,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    prisma.$connect();
     const body = await request.json();
     const { publicId } = body;
 
@@ -60,10 +58,8 @@ export async function POST(request: NextRequest) {
       tags: result?.tags,
       thumbnail: result?.thumbnail,
     };
-    await prisma.$disconnect();
     return NextResponse.json(videoDelivery);
   } catch (error) {
-    await prisma.$disconnect();
     console.error("Error fetching video delivery:", error);
     return NextResponse.json(
       { error: "Failed to fetch video delivery information" },
